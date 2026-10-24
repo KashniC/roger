@@ -57,13 +57,13 @@ export default function WorkshopsPage() {
       <section aria-labelledby="hero-title" className="wrap grid grid-cols-[minmax(0,1fr)] items-end gap-14 pb-24 pt-14 md:pt-20 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:gap-16">
         <div>
           <h1 id="hero-title" className="lines text-[clamp(2.125rem,4.2vw,4rem)] md:whitespace-nowrap font-[650] leading-[1] tracking-[-0.045em] text-stretch-display">
-            <span className="line">
-              <span data-line style={{ "--i": 0 } as React.CSSProperties}>
+            <span className="line block">
+              <span data-line className="block" style={{ "--i": 0 } as React.CSSProperties}>
                 A free AI workshop
               </span>
             </span>
-            <span className="line">
-              <span data-line style={{ "--i": 1 } as React.CSSProperties}>
+            <span className="line block">
+              <span data-line className="block" style={{ "--i": 1 } as React.CSSProperties}>
                 for your members
               </span>
             </span>

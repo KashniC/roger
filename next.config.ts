@@ -3,6 +3,13 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   cacheComponents: true,
   partialPrefetching: true,
+  experimental: {
+    // Vercel restores Turbopack's build cache between deploys, and the Tailwind
+    // loader below doesn't invalidate it when globals.css changes: the Oct 24
+    // deploy shipped new pages with the previous build's stylesheet. Builds are
+    // small, so build cold every time.
+    turbopackFileSystemCacheForBuild: false,
+  },
   turbopack: {
     rules: {
       "*.css": {

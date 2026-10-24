@@ -75,7 +75,7 @@ export function SiteHeader() {
         </Link>
 
         <nav aria-label="Main" className="ml-auto hidden md:block">
-          <ul className="flex items-center gap-7 text-small text-ink-2">
+          <ul className="flex items-center gap-5 whitespace-nowrap text-small text-ink-2 lg:gap-7">
             {nav.links.map((l) => {
               const active = l.href === path;
               return (
