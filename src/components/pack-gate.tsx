@@ -8,7 +8,7 @@ import { readUtm, trackEvent, useMounted } from "@/lib/session";
 const idle: ActionState = { status: "idle" };
 
 /** Email unlocks the rest of the pack; the page re-renders with all ten. */
-export function PackGate({ persona, remaining }: { persona: string; remaining: number }) {
+export function PackGate({ persona, locked }: { persona: string; locked: string[] }) {
   const id = useId();
   const router = useRouter();
   const [state, action, pending] = useActionState(saveLead, idle);
@@ -23,10 +23,18 @@ export function PackGate({ persona, remaining }: { persona: string; remaining: n
   }, [state.status, persona, router]);
 
   return (
-    <form action={action} className="lit-card rounded-[32px] p-7 sm:p-9">
-      <h2 className="text-h3">Get the other {remaining}.</h2>
-      <p className="mt-2 max-w-[30rem] text-small text-white/75">Free. We’ll also send the pack to your inbox and one new use case a week that fits it. Unsubscribe any time.</p>
-      <div className="mt-6 flex flex-col gap-2 sm:flex-row">
+    <form action={action} className="on-night grid gap-8 rounded-[8px] bg-night p-7 text-night-ink sm:px-6 sm:py-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-14">
+      <div>
+        <h2 className="text-h2">Get the other {locked.length}</h2>
+        <ul className="mt-5 grid grid-cols-2 gap-x-6 gap-y-1.5 text-small text-night-ink">
+          {locked.map((n) => (
+            <li key={n}>{n}</li>
+          ))}
+        </ul>
+      </div>
+      <div className="lg:self-end">
+        <p className="max-w-[30rem] text-small text-night-ink">Free. We’ll also send the pack to your inbox, and one new use case a week that fits it. Unsubscribe any time.</p>
+        <div className="mt-5 flex flex-col gap-2 sm:flex-row">
         <label htmlFor={`${id}-e`} className="sr-only">
           Email
         </label>
@@ -37,23 +45,24 @@ export function PackGate({ persona, remaining }: { persona: string; remaining: n
           required
           autoComplete="email"
           placeholder="you@example.com"
-          className="h-12 min-w-0 flex-1 rounded-full border border-white/25 bg-white/10 px-5 text-body text-white outline-none placeholder:text-white/55 focus:border-white"
+          className="h-12 min-w-0 flex-1 rounded-[8px] border border-white/25 bg-white/[0.06] px-4 text-body text-white outline-none placeholder:text-white/55 focus:border-white"
         />
         <input type="hidden" name="persona" value={persona} />
         <input type="hidden" name="kind" value="pack" />
         <input type="hidden" name="utm" value={utm} />
-        <div aria-hidden="true" className="absolute -left-[9999px]">
+        <div aria-hidden="true" className="sr-only">
           <input type="text" name="_gotcha" tabIndex={-1} autoComplete="off" />
         </div>
-        <button type="submit" disabled={pending} className="btn btn-m btn-light">
-          {pending ? "Unlocking…" : "Unlock the pack"}
+        <button type="submit" disabled={pending} className="btn btn-l btn-light">
+          {pending ? "Sending…" : "Send me all ten"}
         </button>
+        </div>
+        {state.status === "error" && (
+          <p role="alert" className="mt-3 text-small text-white">
+            {state.message}
+          </p>
+        )}
       </div>
-      {state.status === "error" && (
-        <p role="alert" className="mt-3 text-small text-white">
-          {state.message}
-        </p>
-      )}
     </form>
   );
 }

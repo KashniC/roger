@@ -11,14 +11,14 @@ async function Result({ searchParams }: { searchParams: Promise<{ t?: string }> 
   return query ? (
     <>
       <h1 className="text-h2">You’re watching for it.</h1>
-      <p className="mt-4 max-w-[34rem] text-lead text-ink-2">
+      <p className="mt-4 max-w-[34rem] text-lead">
         We’ll email you the day someone’s agent does <strong className="font-[600] text-ink">“{query}”</strong>. The library checks new posts every morning.
       </p>
     </>
   ) : (
     <>
       <h1 className="text-h2">That link has expired.</h1>
-      <p className="mt-4 max-w-[34rem] text-lead text-ink-2">Set the watch again from the library and we’ll send a fresh link.</p>
+      <p className="mt-4 max-w-[34rem] text-lead">Set the watch again from the library and we’ll send a fresh link.</p>
     </>
   );
 }
@@ -26,7 +26,7 @@ async function Result({ searchParams }: { searchParams: Promise<{ t?: string }> 
 export default function Page({ searchParams }: PageProps<"/watch/confirm">) {
   return (
     <section className="wrap py-24 md:py-32">
-      <Suspense fallback={<p className="text-lead text-ink-2">Confirming…</p>}>
+      <Suspense fallback={<p className="text-lead">Confirming…</p>}>
         <Result searchParams={searchParams as Promise<{ t?: string }>} />
       </Suspense>
       <p className="mt-10">

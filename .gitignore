@@ -50,3 +50,4 @@ design/gen/raw/
 /.agents/
 skills-lock.json
 !.env.example
+/.taste-skill/

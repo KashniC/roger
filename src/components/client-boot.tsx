@@ -96,7 +96,7 @@ export function StickyCta({ actions, summary }: { actions: StickyAction[]; summa
 
   return (
     <div
-      className={`fixed inset-x-0 bottom-0 z-30 border-t border-rule bg-ground/90 backdrop-blur-xl transition-transform duration-300 ease-[var(--ease-out)] md:hidden ${
+      className={`fixed inset-x-0 bottom-0 z-30 bg-ground-2 transition-transform duration-300 ease-[var(--ease-out)] md:hidden ${
         show ? "translate-y-0" : "pointer-events-none translate-y-full"
       }`}
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}

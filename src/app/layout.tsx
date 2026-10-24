@@ -6,6 +6,7 @@ import { SiteHeader } from "@/components/site-header";
 import { MinimalFooter, SiteFooter } from "@/components/site-footer";
 import { FooterSwitch } from "@/components/footer-switch";
 import { ClientBoot, CodeBanner } from "@/components/client-boot";
+import { Reveals } from "@/components/reveals";
 import { SettingsProvider } from "@/components/settings-provider";
 import { getSettings } from "@/lib/settings";
 import "./globals.css";
@@ -75,6 +76,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd() }} />
         <SettingsProvider value={{ setupCall: s.setupCall, setupCheckout: s.setupCheckout, planCheckout: s.planCheckout, companyCall: s.companyCall }}>
           <ClientBoot />
+          <Reveals />
           <SiteHeader />
           <CodeBanner />
           <main id="main" className="flex-1">

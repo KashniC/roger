@@ -63,7 +63,7 @@ export default async function AdminConnections() {
                   <p className="text-meta font-[600] text-ink-2">Prompt for your agent</p>
                   <CopyPrompt text={botPrompt(endpoint, token)} />
                 </div>
-                <pre className={code}>{botPrompt(endpoint, token)}</pre>
+                <p className="mt-2 whitespace-pre-wrap rounded-[var(--radius-inner)] bg-ground-2 p-4 text-small [overflow-wrap:anywhere]">{botPrompt(endpoint, token)}</p>
               </div>
               <div className="grid gap-5 sm:grid-cols-2">
                 <div>

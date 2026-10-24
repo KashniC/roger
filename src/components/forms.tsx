@@ -121,7 +121,7 @@ export function WorkshopForm() {
 
   if (!siteConfig.forms.workshopEndpoint) {
     return (
-      <div className="rounded-[var(--radius-object)] border border-rule bg-surface p-7 sm:p-10">
+      <div className="rounded-[8px] bg-surface p-7 sm:p-10">
         <h3 className="text-title">Email us to request a date</h3>
         <p className="mt-3 max-w-[34rem] text-body text-ink-2">
           Send your group’s name, roughly how many people, and a month that works. We’ll reply within 1 business day to find a date.
@@ -139,7 +139,7 @@ export function WorkshopForm() {
 
   if (state.status === "ok") {
     return (
-      <div role="status" className="rounded-[var(--radius-object)] border border-rule bg-surface p-7 sm:p-10">
+      <div role="status" className="rounded-[8px] bg-surface p-7 sm:p-10">
         <h3 className="text-title">Thanks. We’ll reply within 1 business day to find a date.</h3>
       </div>
     );
@@ -157,7 +157,7 @@ export function WorkshopForm() {
   const aria = (k: string) => ({ "aria-invalid": !!fe[k], "aria-describedby": fe[k] ? `${id}-${k}-err` : undefined });
 
   return (
-    <form action={action} noValidate className="relative grid gap-6 rounded-[var(--radius-object)] border border-rule bg-surface p-7 sm:grid-cols-2 sm:p-10">
+    <form action={action} noValidate className="relative grid gap-6 rounded-[8px] bg-surface p-7 sm:grid-cols-2 sm:p-10">
       <div className="sm:col-span-2">
         <label htmlFor={`${id}-org`} className={label}>
           Organisation <span className="text-ink-2">(required)</span>
@@ -214,7 +214,7 @@ export function WorkshopForm() {
         <legend className={label}>Format</legend>
         <div className="mt-3 flex flex-wrap gap-3">
           {["In person", "Zoom", "Either"].map((f) => (
-            <label key={f} className="flex min-h-11 cursor-pointer items-center gap-2 rounded-full border border-rule-strong px-4 text-small has-[:checked]:border-ink has-[:checked]:shadow-[inset_0_0_0_1px_var(--color-ink)]">
+            <label key={f} className="flex min-h-11 cursor-pointer items-center gap-2 rounded-full border border-rule-strong px-4 text-small has-[:checked]:border-ink has-[:checked]:bg-ink has-[:checked]:text-ground">
               <input type="radio" name="format" value={f} className="accent-[var(--color-accent)]" defaultChecked={f === "Either"} />
               {f}
             </label>

@@ -1,9 +1,12 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
+import dawn from "@/assets/img/toronto-dawn.jpg";
 import { Suspense } from "react";
 import { ActionLink } from "@/components/action-link";
 import { FaqSection } from "@/components/sections";
 import { siteConfig } from "@/data/config";
+import { credits } from "@/data/credits";
 import { getUseCases } from "@/lib/library-source";
 import { getSettings } from "@/lib/settings";
 
@@ -17,9 +20,21 @@ export const metadata: Metadata = {
 };
 
 const steps = [
-  { when: "Day 0", title: "A free 20-minute call.", body: "What eats your week, which agent you use (or should), and the setups from the library that fit. You pay once you’ve agreed the plan." },
-  { when: "Within a week", title: "The setup session.", body: "Peter installs your agents on your own accounts, with you, by video. You leave with them running and a page explaining each one." },
-  { when: "A week later", title: "Check-in.", body: "What worked, what didn’t, and the one or two changes that make it stick." },
+  {
+    when: "Day 0",
+    title: "A free 20-minute call.",
+    body: "What eats your week, which agent you use (or should), and the setups from the library that fit. You pay once you’ve agreed the plan.",
+  },
+  {
+    when: "Within a week",
+    title: "The setup session.",
+    body: "Peter installs your agents on your own accounts, with you, by video. You leave with them running and a page explaining each one.",
+  },
+  {
+    when: "A week later",
+    title: "Check-in.",
+    body: "What worked, what didn’t, and the one or two changes that make it stick.",
+  },
 ];
 
 const includes = [
@@ -38,138 +53,376 @@ const plan = [
 ];
 
 const faqs = [
-  { q: "Which agent do you set up?", a: "Whichever fits you. Muse, Grok Bot, Hark and others all show up in the library. We’ll recommend one on the call and tell you why." },
-  { q: "Do I own it?", a: "Yes. Everything runs on your accounts. If you stop working with us, it keeps running." },
-  { q: "What about my passwords?", a: "You sign in yourself during the session. We don’t keep passwords, and we remove any access we used at the end." },
-  { q: "What does it cost after the setup?", a: `Your agent’s own subscription, paid to the provider. The $${planPrice}/month plan is optional.` },
-  { q: "Does it send or buy things on its own?", a: "Only where you set a rule that it can. By default it drafts and you approve." },
-  { q: "Is there a free version?", a: "Yes: the starter packs are free, with the instructions to set the agents up yourself." },
+  {
+    q: "Which agent do you set up?",
+    a: "Whichever fits you. Muse, Grok Bot, Hark and others all show up in the library. We’ll recommend one on the call and tell you why.",
+  },
+  {
+    q: "Do I own it?",
+    a: "Yes. Everything runs on your accounts. If you stop working with us, it keeps running.",
+  },
+  {
+    q: "What about my passwords?",
+    a: "You sign in yourself during the session. We don’t keep passwords, and we remove any access we used at the end.",
+  },
+  {
+    q: "What does it cost after the setup?",
+    a: `Your agent’s own subscription, paid to the provider. The $${planPrice}/month plan is optional.`,
+  },
+  {
+    q: "Does it send or buy things on its own?",
+    a: "Only where you set a rule that it can. By default it drafts and you approve.",
+  },
+  {
+    q: "Is there a free version?",
+    a: "Yes: the starter packs are free, with the instructions to set the agents up yourself.",
+  },
 ];
 
-async function FromUseCase({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
+async function FromUseCase({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
   const sp = await searchParams;
   const from = typeof sp.from === "string" ? sp.from : "";
   if (!from) return null;
   const u = (await getUseCases()).find((x) => x.id === from);
   if (!u) return null;
   return (
-    <p className="mt-6 max-w-[36rem] rounded-[var(--radius-inner)] border border-rule bg-surface p-4 text-small">
-      <span className="text-ink-2">You came from </span>
-      <a className="tlink" href={u.url} target="_blank" rel="noopener noreferrer nofollow">
+    <p className="mt-6 max-w-[36rem] rounded-[8px] bg-ground-2 p-4 text-small">
+      You came from{" "}
+      <a
+        className="tlink"
+        href={u.url}
+        target="_blank"
+        rel="noopener noreferrer nofollow"
+      >
         {u.title}
       </a>
-      <span className="text-ink-2">. Say so on the call and we’ll start with that one.</span>
+      . Say so on the call and we’ll start with that one.
     </p>
   );
 }
 
+/** A sample page from the guide every setup ends with. */
+function GuideSample() {
+  return (
+    <figure>
+      <div
+        data-ui
+        className="rounded-[8px] bg-surface p-6 text-[0.9375rem] sm:p-7 lg:-mr-7"
+      >
+        <p className="text-[0.8125rem] font-[600] text-ink-2">
+          Your agents · page 1 of 6
+        </p>
+        <p className="mt-3 text-[1.25rem] font-[620] tracking-[-0.02em]">
+          Morning brief
+        </p>
+        <dl className="mt-4 grid grid-cols-[7rem_minmax(0,1fr)] gap-x-4 gap-y-2">
+          <dt className="text-ink-2">Runs</dt>
+          <dd>Weekdays at 6:45am</dd>
+          <dt className="text-ink-2">Reads</dt>
+          <dd>Your email, calendar and task list</dd>
+          <dt className="text-ink-2">Sends you</dt>
+          <dd>
+            One screen: meetings, replies owed, what’s overdue, one thing first
+          </dd>
+          <dt className="text-ink-2">Never</dt>
+          <dd>Replies, books or pays on its own</dd>
+          <dt className="text-ink-2">To change it</dt>
+          <dd>Tell it in plain words: “skip Fridays”</dd>
+        </dl>
+      </div>
+      <figcaption className="mt-3 text-small text-ink-2">
+        A sample page from the guide you keep after the session.
+      </figcaption>
+    </figure>
+  );
+}
+
+/** The monthly plan's note: library finds matched to one setup. */
+function MonthlyNote({
+  picks,
+}: {
+  picks: { title: string; handle: string }[];
+}) {
+  return (
+    <figure>
+      <div
+        data-ui
+        className="rounded-[8px] bg-night-2 p-6 text-[0.9375rem] text-night-ink sm:p-7 lg:-mr-7"
+      >
+        <p className="text-[0.8125rem] text-night-ink-2">From Peter · to you</p>
+        <p className="mt-2 text-[1.125rem] font-[600] tracking-[-0.015em]">
+          This month: {picks.length} new things your agents could do
+        </p>
+        <ul className="mt-4 space-y-1">
+          {picks.map((p) => (
+            <li
+              key={p.title}
+              className="flex justify-between gap-4 rounded-[6px] bg-white/[0.05] px-3 py-2.5"
+            >
+              <span>{p.title}</span>
+              <span className="whitespace-nowrap text-night-ink-2">
+                {p.handle}
+              </span>
+            </li>
+          ))}
+        </ul>
+        <p className="mt-4 text-night-ink-2">
+          Reply with the ones you want and I’ll add them on our next check-in.
+        </p>
+      </div>
+      <figcaption className="mt-3 text-small text-night-ink-2">
+        An example note, built from this week’s library.
+      </figcaption>
+    </figure>
+  );
+}
+
 export default async function SetupPage({ searchParams }: PageProps<"/setup">) {
-  const s = await getSettings();
+  const [s, library] = await Promise.all([getSettings(), getUseCases()]);
   const { planCheckout } = s;
+  const picks = library
+    .filter((u) =>
+      ["solo", "chief-of-staff", "customers", "bookkeeping"].includes(
+        u.category,
+      ),
+    )
+    .slice(0, 3);
+  const dawnCredit = credits.torontoDawn;
   return (
     <>
-      <section aria-labelledby="hero-title" className="wrap grid grid-cols-[minmax(0,1fr)] gap-12 pb-20 pt-10 md:pt-16 lg:grid-cols-[minmax(0,1fr)_24rem] lg:items-end lg:gap-16">
+      <section
+        aria-labelledby="hero-title"
+        className="wrap grid grid-cols-[minmax(0,1fr)] gap-12 pb-24 pt-14 md:pt-20 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:items-end lg:gap-16"
+      >
         <div>
-          <p className="text-small font-[560] text-ink-2">Custom setup</p>
-          <h1 id="hero-title" className="mt-4 max-w-[13ch] text-display text-stretch-display">
-            Your agents, set up for you.
+          <h1
+            id="hero-title"
+            className="lines text-display text-stretch-display"
+          >
+            <span className="line">
+              <span data-line style={{ "--i": 0 } as React.CSSProperties}>
+                Your agents,
+              </span>
+            </span>
+            <span className="line">
+              <span data-line style={{ "--i": 1 } as React.CSSProperties}>
+                set up for you
+              </span>
+            </span>
           </h1>
-          <p className="mt-6 max-w-[36rem] text-lead text-ink-2">
-            Peter designs a set of agents for how you work, from what’s actually working in the library, and installs them on your own accounts with you.
-          </p>
-          <div id="hero-cta" className="mt-9 flex flex-wrap items-center gap-x-7 gap-y-4">
-            <ActionLink kind="setupCall" location="setup-hero">
-              Book your free setup call
-            </ActionLink>
-            <Link href="/packs/solopreneur" className="tlink chev">
-              Or start with the free pack
-            </Link>
+          <div className="after-lines">
+            <p className="mt-8 max-w-[36rem] text-lead">
+              Peter designs a set of agents for how you work, from what’s
+              actually working in the library, and installs them on your own
+              accounts with you.
+            </p>
+            <div
+              id="hero-cta"
+              className="mt-9 flex flex-wrap items-center gap-x-7 gap-y-4"
+            >
+              <ActionLink kind="setupCall" location="setup-hero">
+                Book your free setup call
+              </ActionLink>
+              <Link href="/packs/solopreneur" className="tlink chev">
+                Or start with the free pack
+              </Link>
+            </div>
+            <Suspense fallback={null}>
+              <FromUseCase searchParams={searchParams} />
+            </Suspense>
           </div>
-          <Suspense fallback={null}>
-            <FromUseCase searchParams={searchParams} />
-          </Suspense>
         </div>
-        <div className="lit-card lit-card-calm rounded-[32px] p-7 sm:p-8">
-          <p className="text-meta text-white/70">Custom setup</p>
-          <p className="mt-3 flex items-baseline gap-2">
-            <span className="text-[4.5rem] font-[600] leading-none tracking-[-0.05em]">${s.setupPrice}</span>
-            <span className="text-small text-white/70">once</span>
+        <div className="after-lines rounded-[8px] bg-ground-2 p-7 sm:p-8 lg:-mr-8">
+          <p className="flex items-baseline gap-2">
+            <span className="text-[clamp(4rem,7vw,6rem)] font-[650] leading-none tracking-[-0.05em]">
+              ${s.setupPrice}
+            </span>
+            <span className="text-lead text-ink-2">once</span>
           </p>
-          <ul className="mt-6 space-y-2.5 border-t border-white/15 pt-5 text-small">
+          <ul className="mt-6 space-y-2.5 text-small">
             {includes.map((i) => (
               <li key={i} className="flex gap-3">
-                <svg viewBox="0 0 16 16" className="mt-[0.2em] size-4 shrink-0 text-white/70" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <svg
+                  viewBox="0 0 16 16"
+                  className="mt-[0.25em] size-4 shrink-0 text-accent"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
                   <path d="m3.5 8.5 3 3 6-7" />
                 </svg>
                 {i}
               </li>
             ))}
           </ul>
-          <p className="mt-6 text-meta text-white/65">Paid on the call, once you’ve agreed what we’ll set up.</p>
+          <p className="mt-6 text-small text-ink-2">
+            Paid on the call, once you’ve agreed what we’ll set up. Prices in
+            CAD, no HST charged.
+          </p>
         </div>
       </section>
 
-      <section aria-labelledby="how-title" className="border-t border-rule bg-ground-2">
-        <div className="wrap py-20 md:py-28">
-          <h2 id="how-title" className="text-h2">
-            How it works.
-          </h2>
-          <ol className="mt-12 grid gap-0 md:grid-cols-3 md:gap-8">
-            {steps.map((s, i) => (
-              <li key={s.when} className="relative border-l border-rule pb-9 pl-7 md:border-l-0 md:border-t md:pb-0 md:pl-0 md:pt-8">
-                <span aria-hidden="true" className={`absolute -left-[5px] top-1 size-[9px] rounded-full md:-top-[5px] md:left-0 ${i === 0 ? "bg-ink" : "border border-rule-strong bg-ground-2"}`} />
-                <p className="text-meta font-[600] text-ink-2">{s.when}</p>
-                <h3 className="mt-2 text-title">{s.title}</h3>
-                <p className="mt-2 text-small text-ink-2">{s.body}</p>
-              </li>
-            ))}
-          </ol>
-        </div>
-      </section>
-
-      <section id="plan" aria-labelledby="plan-title" className="on-night scroll-mt-14 bg-night text-night-ink">
-        <div className="wrap grid gap-12 py-24 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] md:items-center md:py-32">
+      <section aria-labelledby="how-title" className="bg-ground-2">
+        <div
+          className="wrap grid grid-cols-[minmax(0,1fr)] gap-12 py-28 md:py-40 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:gap-16"
+          data-reveal
+        >
           <div>
-            <p className="text-small font-[600] text-night-ink-2">After your setup</p>
-            <h2 id="plan-title" className="mt-2 max-w-[14ch] text-h2">
-              The monthly plan.
+            <h2 id="how-title" className="text-h2">
+              How it works
             </h2>
-            <p className="mt-4 max-w-[30rem] text-lead text-night-ink/80">Your setup keeps getting better as the library grows. Optional, and only for people who’ve had a setup.</p>
+            <ol className="mt-12 space-y-1">
+              {steps.map((st, i) => (
+                <li
+                  key={st.when}
+                  className={`grid gap-x-6 gap-y-1 rounded-[8px] px-5 py-6 sm:grid-cols-[9rem_minmax(0,1fr)] sm:px-6 ${i % 2 ? "bg-[#e9e9ec]" : "bg-ground"}`}
+                >
+                  <p className="text-lead font-[560] text-ink-2">{st.when}</p>
+                  <div>
+                    <h3 className="text-title">{st.title}</h3>
+                    <p className="mt-1 text-small">{st.body}</p>
+                  </div>
+                </li>
+              ))}
+            </ol>
           </div>
-          <div className="rounded-[var(--radius-object)] border border-night-rule bg-night-2 p-7 sm:p-9">
-            <p className="flex items-baseline gap-2">
+          <div className="lg:pt-24">
+            <GuideSample />
+          </div>
+        </div>
+      </section>
+
+      <figure>
+        <div className="relative h-[48svh] min-h-[20rem] overflow-clip bg-night">
+          <Image
+            src={dawn}
+            alt="Toronto’s skyline and the CN Tower at sunrise, seen across Lake Ontario"
+            fill
+            sizes="100vw"
+            placeholder="blur"
+            className="drift object-cover object-[50%_60%]"
+          />
+        </div>
+        <figcaption className="wrap mt-4 flex flex-wrap justify-between gap-x-8 gap-y-1 text-small">
+          <span>Sessions run by video from Toronto, on your own accounts.</span>
+          <span className="text-ink-2">
+            Photo:{" "}
+            <a
+              href={dawnCredit.source}
+              className="underline underline-offset-4"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {dawnCredit.by}
+            </a>
+            ,{" "}
+            <a
+              href={dawnCredit.licenceUrl}
+              className="underline underline-offset-4"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {dawnCredit.licence}
+            </a>
+          </span>
+        </figcaption>
+      </figure>
+
+      <section
+        id="plan"
+        aria-labelledby="plan-title"
+        className="on-night mt-28 scroll-mt-16 bg-night text-night-ink md:mt-40"
+      >
+        <div
+          className="wrap grid gap-12 py-28 md:py-40 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-center"
+          data-reveal
+        >
+          <div>
+            <h2 id="plan-title" className="max-w-[16ch] text-h2">
+              The monthly plan, after your setup
+            </h2>
+            <p className="mt-4 max-w-[30rem] text-lead text-night-ink">
+              Your setup keeps getting better as the library grows. Optional,
+              and only for people who’ve had a setup.
+            </p>
+            <p className="mt-8 flex items-baseline gap-2">
               <span className="text-h2 leading-none">${s.planPrice}</span>
               <span className="text-small text-night-ink-2">a month</span>
             </p>
-            <ul className="mt-6 space-y-2.5 border-t border-night-rule pt-5 text-small">
+            <ul className="mt-6 space-y-2.5 text-small">
               {plan.map((p) => (
                 <li key={p} className="flex gap-3">
-                  <span aria-hidden="true" className="mt-[0.55em] size-1.5 shrink-0 rounded-full bg-[#f0b88f]" />
+                  <span
+                    aria-hidden="true"
+                    className="mt-[0.55em] size-1.5 shrink-0 rounded-full bg-accent-night"
+                  />
                   {p}
                 </li>
               ))}
             </ul>
-            <div className="mt-7">
+            <div className="mt-8">
               {planCheckout ? (
-                <ActionLink kind="planCheckout" location="setup-plan" size="m" tone="light">
+                <ActionLink
+                  kind="planCheckout"
+                  location="setup-plan"
+                  size="m"
+                  tone="light"
+                >
                   Start the plan
                 </ActionLink>
               ) : (
-                <p className="text-small text-night-ink-2">Add it on your setup call.</p>
+                <p className="text-small text-night-ink-2">
+                  Add it on your setup call.
+                </p>
               )}
             </div>
           </div>
+          <MonthlyNote
+            picks={picks.map((u) => ({ title: u.title, handle: u.handle }))}
+          />
         </div>
       </section>
 
       <FaqSection offer="work" items={faqs} />
 
-      <section id="final-cta" className="bg-ground">
-        <div className="wrap flex flex-wrap items-end justify-between gap-8 py-24">
-          <h2 className="max-w-[16ch] text-h2">Twenty minutes to find your setup.</h2>
-          <ActionLink kind="setupCall" location="setup-final">
-            Book your free setup call
-          </ActionLink>
+      <section
+        id="final-cta"
+        aria-labelledby="final-title"
+        className="bg-ground"
+      >
+        <div
+          className="wrap grid grid-cols-[minmax(0,1fr)] gap-10 pt-28 md:pt-40 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:items-end lg:gap-16"
+          data-reveal
+        >
+          <h2 id="final-title" className="text-h2 lg:max-w-[16ch]">
+            Twenty minutes to find your setup
+          </h2>
+          <div
+            data-ui
+            className="rounded-[8px] bg-ground-2 p-6 sm:p-7 lg:-mr-7"
+          >
+            <p className="text-title">Free setup call</p>
+            <p className="mt-1 text-small text-ink-2">
+              20 minutes · video · with Peter
+            </p>
+            <ul className="mt-4 space-y-1.5 text-small">
+              <li>What eats your week, and which agent you use</li>
+              <li>The library setups that fit</li>
+              <li>A plan and a price before anything is paid</li>
+            </ul>
+            <div className="mt-6">
+              <ActionLink kind="setupCall" location="setup-final">
+                Pick a time
+              </ActionLink>
+            </div>
+          </div>
         </div>
       </section>
     </>

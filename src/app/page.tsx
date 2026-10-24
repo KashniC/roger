@@ -1,202 +1,327 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
-import { AskBox } from "@/components/ask-box";
-import { PackCards } from "@/components/pack-cards";
-import { Rail, RailItem } from "@/components/rail";
-import { ExternalIcon, UseCaseCard } from "@/components/use-case-card";
-import { categories, categoryLabel, type UseCase, type UseCaseCategory } from "@/data/library";
-import { packs } from "@/data/packs";
+import dawn from "@/assets/img/toronto-dawn.jpg";
+import { LibraryAgenda } from "@/components/home/library-agenda";
+import { LiveSearch, type Entry } from "@/components/home/live-search";
+import { PackBoard } from "@/components/home/pack-board";
+import { PlanStage } from "@/components/home/plan-stage";
+import { WatchSentence } from "@/components/home/watch-sentence";
+import { Interest } from "@/components/pack-cards";
+import { VideoLoop } from "@/components/video-loop";
+import { credits } from "@/data/credits";
+import { categories, type UseCase } from "@/data/library";
 import { ladderFor } from "@/data/ladder";
-import { getSettings } from "@/lib/settings";
+import { livePack, packs } from "@/data/packs";
 import { getUseCases } from "@/lib/library-source";
+import { getSettings } from "@/lib/settings";
 
 export const metadata: Metadata = {
   title: { absolute: "Roger: what people’s AI agents actually do" },
   description:
-    "A growing library of real AI agent use cases from people running Muse, Grok Bot, Hark and more, collected from public posts every morning. Search it, watch for what you need, and get a free starter pack.",
+    "A growing library of real AI agent use cases from people running Muse, Grok Bot, Hark and more, read from public posts every morning. Search it, watch for what you need, and get a free starter pack.",
   alternates: { canonical: "/" },
   openGraph: { url: "/" },
 };
 
-const examples = ["meal plans", "inbox clean-up", "gift cards", "lead follow-up", "scam guard"];
-const waiting = ["Reconcile every line in QuickBooks, every time", "Book a table the moment one opens up", "Catch a refund that came back short"];
+const OPEN_IN_PACK = 3;
 
-function newest(list: UseCase[], n: number) {
-  return [...list].sort((a, b) => (b.addedAt ?? b.weekOf).localeCompare(a.addedAt ?? a.weekOf)).slice(0, n);
-}
+const lean = (u: UseCase): Entry => ({
+  id: u.id,
+  title: u.title,
+  summary: u.summary,
+  category: u.category,
+  tool: u.tool,
+  handle: u.handle,
+  url: u.url,
+});
 
-function shelves(list: UseCase[]) {
-  const by = new Map<UseCaseCategory, UseCase[]>();
-  for (const u of list) by.set(u.category, [...(by.get(u.category) ?? []), u]);
+const PER_SHELF = 8;
+
+/** Each shelf with its count and its newest few; the library page has the rest. */
+function byShelf(list: UseCase[]) {
   return categories
-    .map((c) => ({ id: c.id, label: c.label, items: by.get(c.id) ?? [] }))
-    .filter((s) => s.items.length > 0)
-    .sort((a, b) => b.items.length - a.items.length);
+    .map((c) => {
+      const all = list.filter((u) => u.category === c.id);
+      return {
+        id: c.id,
+        label: c.label,
+        n: all.length,
+        items: all.slice(0, PER_SHELF).map(lean),
+      };
+    })
+    .filter((s) => s.n > 0)
+    .sort((a, b) => b.n - a.n);
 }
 
 export default async function LibraryHome() {
   const [all, settings] = await Promise.all([getUseCases(), getSettings()]);
-  const ladder = ladderFor(settings);
-  const fresh = newest(all, 3);
-  const rows = shelves(all);
-  const latest = fresh[0]?.addedAt ?? fresh[0]?.weekOf;
+  const sorted = [...all].sort((a, b) =>
+    (b.addedAt ?? b.weekOf).localeCompare(a.addedAt ?? a.weekOf),
+  );
+  const shelves = byShelf(sorted);
+  const total = all.length;
+  const plans = ladderFor(settings).rungs;
+  const pack = livePack;
+  const next = packs.filter((p) => p.status === "soon");
+  const dawnCredit = credits.torontoDawn;
+  const aerial = credits.torontoAerial;
+  const latest = sorted[0];
+  const newest =
+    latest &&
+    new Date(latest.addedAt ?? latest.weekOf).toLocaleDateString("en-CA", {
+      month: "long",
+      day: "numeric",
+      timeZone: "America/Toronto",
+    });
 
   return (
     <>
-      {/* 1 · What is this, and can I use it right now? */}
-      <section aria-labelledby="hero-title" className="wrap grid grid-cols-[minmax(0,1fr)] gap-12 pb-16 pt-10 md:pt-16 lg:grid-cols-[minmax(0,1fr)_25rem] lg:items-end lg:gap-14 lg:pb-20">
-        <div>
-          <p className="text-small font-[560] text-ink-2">The Roger library · {all.length} use cases, more every morning</p>
-          <h1 id="hero-title" className="mt-4 text-display text-stretch-display md:max-w-[15ch]">
-            What are people’s AI agents actually doing?
-          </h1>
-          <p className="mt-6 max-w-[36rem] text-lead text-ink-2">
-            Real things people get from Muse, Grok Bot, Hark and more, collected from public posts every day. Find yours, or tell us what you’re waiting for.
-          </p>
-          <div id="hero-cta" className="mt-8 max-w-[42rem]">
-            <AskBox count={all.length} examples={examples} />
-          </div>
-        </div>
-
-        {/* Float: the newest finds, lit like a notification stack */}
-        <aside aria-labelledby="fresh-title" className="lit-card lit-card-calm rounded-[32px] p-6 sm:p-7">
-          <p className="flex items-center justify-between text-meta text-white/70">
-            <span id="fresh-title" className="flex items-center gap-2 font-[560] text-white">
-              <span aria-hidden="true" className="size-2 rounded-full bg-[#f0b88f] shadow-[0_0_0_4px_rgba(240,184,143,0.18)]" />
-              Newest in the library
-            </span>
-            {latest && <span>{new Date(latest).toLocaleDateString("en-CA", { month: "short", day: "numeric" })}</span>}
-          </p>
-          <ul className="rise-in mt-4 space-y-2">
-            {fresh.map((u) => (
-              <li key={u.id}>
-                <a href={u.url} target="_blank" rel="noopener noreferrer nofollow" className="block rounded-[18px] border border-white/10 bg-white/[0.06] p-4 transition-colors hover:bg-white/[0.1]">
-                  <span className="block text-[1.0625rem] font-[600] leading-snug tracking-[-0.015em]">{u.title}</span>
-                  <span className="mt-1.5 flex items-center gap-1.5 text-meta text-white/75">
-                    {[u.tool, u.handle].filter(Boolean).join(" · ")}
-                    <ExternalIcon className="size-3" />
-                  </span>
-                </a>
-              </li>
-            ))}
-          </ul>
-        </aside>
-      </section>
-
-      {/* 2 · Where do I start? A free pack for who I am */}
-      <section aria-labelledby="packs-title" className="border-t border-rule bg-ground-2">
-        <div className="wrap py-20 md:py-24">
-          <div className="flex flex-wrap items-end justify-between gap-4">
-            <div className="max-w-[40rem]">
-              <h2 id="packs-title" className="text-h2">
-                Start with a free pack.
-              </h2>
-              <p className="mt-3 text-lead text-ink-2">Ten agents to set up, picked from the library for how you work. Solopreneurs first; tell us which pack you want next.</p>
+      {/* What is this, and can I use it right now? The library, working. */}
+      <section
+        aria-labelledby="hero-title"
+        className="on-night bg-night text-night-ink"
+      >
+        <div className="wrap grid grid-cols-[minmax(0,1fr)] gap-10 pb-24 pt-14 md:pt-20 lg:grid-cols-[minmax(0,6fr)_minmax(0,6fr)] lg:items-start lg:gap-14 lg:pb-32 lg:pt-28">
+          <div>
+            <h1
+              id="hero-title"
+              className="lines text-[clamp(2.75rem,4.6vw,4.5rem)] md:whitespace-nowrap font-[650] leading-[0.98] tracking-[-0.045em] text-stretch-display"
+            >
+              <span className="line">
+                <span data-line style={{ "--i": 0 } as React.CSSProperties}>
+                  What people’s
+                </span>
+              </span>
+              <span className="line">
+                <span data-line style={{ "--i": 1 } as React.CSSProperties}>
+                  AI agents do
+                </span>
+              </span>
+            </h1>
+            <div className="after-lines">
+              <p className="mt-8 max-w-[28rem] text-lead text-night-ink">
+                Real wins from Muse, Grok Bot, Hark and more, read from public
+                posts every morning. Type what you want yours to do.
+              </p>
+              {newest && (
+                <p className="mt-6 max-w-[28rem] text-small text-night-ink-2">
+                  {total.toLocaleString("en-CA")} so far, the newest added{" "}
+                  {newest}. New posts are read first thing every morning.
+                </p>
+              )}
+              {pack && (
+                <Link
+                  href={`/packs/${pack.id}`}
+                  className="btn btn-l btn-light mt-10"
+                >
+                  Get the free 10-agent pack
+                </Link>
+              )}
             </div>
           </div>
-          <div className="mt-10">
-            <PackCards packs={packs} />
+          <div className="after-lines">
+            <LiveSearch
+              newest={sorted.slice(0, 5).map(lean)}
+              total={total}
+              shelves={shelves.map((s) => ({
+                id: s.id,
+                label: s.label,
+                n: s.n,
+              }))}
+            />
           </div>
         </div>
       </section>
 
-      {/* 3 · Browse: a shelf per category */}
-      <section id="shelf" aria-labelledby="shelf-title" className="scroll-mt-14 bg-ground py-20 md:py-28">
-        <div className="wrap grid grid-cols-[minmax(0,1fr)] gap-10 lg:grid-cols-[13rem_minmax(0,1fr)] lg:gap-12">
-          <div>
-            <h2 id="shelf-title" className="text-h2 lg:text-h3">
-              Browse the library
+      {/* Browse it: one shelf at a time */}
+      <section
+        aria-labelledby="shelf-title"
+        className="bg-ground py-28 md:py-40"
+      >
+        <div className="wrap" data-reveal>
+          <div className="flex flex-wrap items-end justify-between gap-6">
+            <h2 id="shelf-title" className="text-h2">
+              <span className="block text-ink-2">Every use case,</span>
+              <span className="block">by what it does.</span>
             </h2>
-            <nav aria-label="Categories" className="mt-6 lg:sticky lg:top-24">
-              <ul className="relative -mx-4 flex gap-2 overflow-x-auto px-4 pb-1 scrollbar-none sm:-mx-6 sm:px-6 lg:mx-0 lg:block lg:px-0">
-                {rows.map((r) => (
-                  <li key={r.id} className="shrink-0 lg:border-b lg:border-rule">
-                    <a href={`#cat-${r.id}`} className="chip flex min-h-10 items-center gap-3 whitespace-nowrap rounded-full border border-rule-strong px-4 text-small text-ink-2 transition-colors hover:text-ink lg:min-h-11 lg:justify-between lg:rounded-none lg:border-0 lg:px-0">
-                      {r.label}
-                      <span className="text-meta">{r.items.length}</span>
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </nav>
+            <Link href="/library" className="btn btn-m btn-ink">
+              See all {total.toLocaleString("en-CA")}
+            </Link>
           </div>
-          <div className="min-w-0 space-y-16">
-            {rows.map((r) => (
-              <div key={r.id} id={`cat-${r.id}`} className="scroll-mt-20">
-                <div className="flex items-baseline justify-between gap-4">
-                  <h3 className="text-h3">{categoryLabel(r.id)}</h3>
-                  <Link href={`/library?cat=${r.id}`} className="tlink chev whitespace-nowrap text-small">
-                    See all {r.items.length}
-                  </Link>
-                </div>
-                <div className="mt-5">
-                  <Rail label={`${r.label} use cases`} inset={false}>
-                    {r.items.slice(0, 8).map((u) => (
-                      <RailItem key={u.id}>
-                        <UseCaseCard u={u} size="rail" />
-                      </RailItem>
-                    ))}
-                  </Rail>
-                </div>
-              </div>
-            ))}
+          <div className="mt-14">
+            <LibraryAgenda shelves={shelves} />
           </div>
         </div>
       </section>
 
-      {/* 4 · What if nobody's agent does what I need yet? */}
-      <section id="watch" aria-labelledby="watch-title" className="on-night scroll-mt-14 bg-night text-night-ink">
-        <div className="wrap grid grid-cols-[minmax(0,1fr)] gap-12 py-24 md:py-32 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-center lg:gap-16">
-          <div>
-            <h2 id="watch-title" className="max-w-[14ch] text-h2">
-              Waiting for an agent that can do it?
-            </h2>
-            <p className="mt-4 max-w-[32rem] text-lead text-night-ink/80">
-              Tell us what you want. The library reads new posts every morning, and the day someone’s agent does it, you get an email with the link.
-            </p>
-            <ul className="mt-8 space-y-2 text-small text-night-ink-2">
-              {waiting.map((w) => (
-                <li key={w} className="flex gap-3">
-                  <span aria-hidden="true" className="mt-[0.55em] size-1.5 shrink-0 rounded-full bg-[#f0b88f]" />
-                  {w}
-                </li>
-              ))}
-            </ul>
-          </div>
-          <AskBox count={all.length} examples={[]} tone="night" />
-        </div>
-      </section>
-
-      {/* 5 · Can someone just set it up for me? */}
-      <section aria-labelledby="ladder-title" className="bg-ground">
-        <div className="wrap py-24 md:py-32">
-          <h2 id="ladder-title" className="max-w-[20ch] text-h2">
-            {ladder.heading}
-          </h2>
-          <ol className="mt-12 grid gap-5 md:grid-cols-3">
-            {ladder.rungs.map((r, i) => (
-              <li key={r.name} className={`flex flex-col rounded-[var(--radius-object)] border p-7 ${i === 1 ? "border-ink bg-surface shadow-[0_30px_60px_-40px_rgba(0,0,0,0.4)]" : "border-rule bg-surface"}`}>
-                <p className="text-small font-[600] text-ink-2">{r.step}</p>
-                <h3 className="mt-2 text-title">{r.name}</h3>
-                <p className="mt-4 flex items-baseline gap-2">
-                  <span className="text-h2 leading-none">{r.price}</span>
-                  <span className="text-small text-ink-2">{r.per}</span>
+      {/* Start today: the free pack, agent by agent */}
+      {pack && (
+        <section
+          aria-labelledby="pack-title"
+          className="on-night bg-night py-28 text-night-ink md:py-40"
+        >
+          <div className="wrap" data-reveal>
+            <div className="grid grid-cols-[minmax(0,1fr)] gap-6 md:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] md:items-end md:gap-14">
+              <h2 id="pack-title" className="text-h2">
+                Ten agents for a business of one
+              </h2>
+              <div>
+                <p className="text-lead text-night-ink">
+                  The free solopreneur pack, each agent with the instruction to
+                  paste in. {OPEN_IN_PACK} are open now, the rest with your
+                  email.
                 </p>
-                <p className="mt-4 text-small text-ink-2">{r.body}</p>
-                <div className="mt-auto pt-7">
-                  <Link href={r.href} className={i === 1 ? "btn btn-m" : "tlink chev text-small"}>
-                    {r.cta}
-                  </Link>
-                </div>
-              </li>
-            ))}
-          </ol>
-          <p className="mt-10 border-t border-rule pt-6 text-small text-ink-2">
-            Running a whole company?{" "}
+                <Link
+                  href={`/packs/${pack.id}`}
+                  className="btn btn-l btn-light mt-6"
+                >
+                  Get the free pack
+                </Link>
+              </div>
+            </div>
+            <div className="mt-14">
+              <PackBoard agents={pack.agents} openCount={OPEN_IN_PACK} />
+            </div>
+            {next.length > 0 && (
+              <div className="mt-20 grid gap-8 md:grid-cols-[minmax(0,4fr)_minmax(0,8fr)]">
+                <h3 className="text-h2">Packs coming next</h3>
+                <ul className="grid gap-x-8 gap-y-10 sm:grid-cols-3">
+                  {next.map((p) => (
+                    <li key={p.id}>
+                      <p className="text-title">{p.persona}</p>
+                      <p className="mt-1 text-small text-night-ink-2">
+                        {p.blurb}
+                      </p>
+                      <div className="mt-4">
+                        <Interest persona={p.id} />
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+        </section>
+      )}
+
+      {/* Or have it done: three plans, one figure */}
+      <section
+        aria-labelledby="plans-title"
+        className="bg-ground py-28 md:py-40"
+      >
+        <div className="wrap" data-reveal>
+          <h2 id="plans-title" className="text-h2">
+            Free, once, or monthly.
+          </h2>
+          <div className="mt-14">
+            <PlanStage plans={plans} />
+          </div>
+          <p className="mt-16 text-small text-ink-2">
+            Prices in CAD, no HST charged. Running a whole company?{" "}
             <Link href="/companies" className="tlink chev">
               Roger for companies
             </Link>
           </p>
+        </div>
+      </section>
+
+      {/* The morning: where the library is read */}
+      <figure>
+        <div className="relative h-[56svh] min-h-[22rem] overflow-clip bg-night">
+          <Image
+            src={dawn}
+            alt="Toronto’s skyline and the CN Tower at sunrise, seen across Lake Ontario"
+            fill
+            sizes="100vw"
+            placeholder="blur"
+            className="drift object-cover object-[50%_60%]"
+          />
+        </div>
+        <figcaption className="wrap mt-4 flex flex-wrap justify-between gap-x-8 gap-y-1 text-small">
+          <span>
+            Toronto from Sam Smith Park, just after sunrise. The library reads
+            the night’s posts first thing each morning.
+          </span>
+          <span className="text-ink-2">
+            Photo:{" "}
+            <a
+              href={dawnCredit.source}
+              className="underline underline-offset-4"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {dawnCredit.by}
+            </a>
+            ,{" "}
+            <a
+              href={dawnCredit.licenceUrl}
+              className="underline underline-offset-4"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {dawnCredit.licence}
+            </a>
+          </span>
+        </figcaption>
+      </figure>
+
+      {/* Nothing yet? We'll tell you the morning there is. */}
+      <section
+        id="watch"
+        aria-labelledby="watch-title"
+        className="scroll-mt-16 bg-ground pt-28 md:pt-40"
+      >
+        <div
+          className="wrap grid grid-cols-[minmax(0,1fr)] gap-12 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:items-center lg:gap-16"
+          data-reveal
+        >
+          <div>
+            <h2 id="watch-title" className="text-h2">
+              Not in the library yet?
+            </h2>
+            <div className="mt-6">
+              <WatchSentence />
+            </div>
+            <p className="mt-6 max-w-[36rem] text-small text-ink-2">
+              We read new posts every morning. The day one matches, you get one
+              email with the link, and every email has a link to stop.
+            </p>
+          </div>
+          <figure>
+            <div className="aspect-[16/10] overflow-clip rounded-[8px] bg-night">
+              <VideoLoop
+                webm="/media/toronto-aerial.webm"
+                mp4="/media/toronto-aerial.mp4"
+                poster="/media/toronto-aerial.jpg"
+                label="Aerial view of downtown Toronto and the CN Tower at first light"
+                className="size-full object-cover"
+              />
+            </div>
+            <figcaption className="mt-3 text-small">
+              Downtown Toronto from the air, lights still on.{" "}
+              <span className="text-ink-2">
+                Video:{" "}
+                <a
+                  href={aerial.source}
+                  className="underline underline-offset-4"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {aerial.by}
+                </a>
+                ,{" "}
+                <a
+                  href={aerial.licenceUrl}
+                  className="underline underline-offset-4"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {aerial.licence}
+                </a>
+              </span>
+            </figcaption>
+          </figure>
         </div>
       </section>
     </>

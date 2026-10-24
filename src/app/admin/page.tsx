@@ -20,9 +20,9 @@ export default async function AdminOverview() {
   ];
 
   const stat = (n: number, label: string, href: string) => (
-    <Link href={href} className="rounded-[var(--radius-object)] border border-rule bg-surface p-6 transition-colors hover:border-rule-strong">
+    <Link href={href} className="group block py-2">
       <p className="text-h2 leading-none">{n}</p>
-      <p className="mt-2 text-small text-ink-2">{label}</p>
+      <p className="mt-2 text-small text-ink-2 group-hover:text-ink">{label}</p>
     </Link>
   );
 
@@ -30,7 +30,7 @@ export default async function AdminOverview() {
     <div className="space-y-12">
       <section>
         <h1 className="text-h3">This week</h1>
-        <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-5 grid gap-x-10 gap-y-6 sm:grid-cols-2 lg:grid-cols-4">
           {stat(c.total, `use cases in the library (${c.week} added this week)`, "/admin/use-cases")}
           {stat(l.packs, "starter-pack sign-ups", "/admin/leads")}
           {stat(l.interest, "asked for a coming-soon pack", "/admin/leads")}

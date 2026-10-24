@@ -22,21 +22,20 @@ export function Thanks({ offer, book, timing, picksLabel, checklistHeading, chec
   return (
     <div className="wrap grid gap-14 py-16 md:grid-cols-[1.1fr_0.9fr] md:py-28">
       <div>
-        <p className="text-small font-[600] text-ink-2">Thank you</p>
-        <h1 className="mt-3 text-h2 text-stretch-display">Payment received.</h1>
-        <p className="mt-5 text-lead text-ink-2">Your receipt is on its way from Stripe. One step left: pick your time.</p>
+        <h1 className="text-h2 text-stretch-display">Thank you, payment received</h1>
+        <p className="mt-5 text-lead">Your receipt is on its way from Stripe. One step left: pick your time.</p>
         <div className="mt-9">
           <ActionLink kind={kind} location="thanks">
             {book}
           </ActionLink>
-          <p className="mt-3 text-small text-ink-2">{timing}</p>
+          <p className="mt-3 text-small">{timing}</p>
           {picks.length > 0 && (
             <p className="mt-6 text-small">
               <span className="text-ink-2">{picksLabel} </span>
               {picks.map(menuTitle).join(", ")}
             </p>
           )}
-          <p className="mt-8 text-small text-ink-2">
+          <p className="mt-8 text-small">
             Trouble booking? Email{" "}
             <a className="tlink" href={`mailto:${siteConfig.contactEmail}?subject=${encodeURIComponent(subject)}`}>
               {siteConfig.contactEmail}
@@ -45,12 +44,11 @@ export function Thanks({ offer, book, timing, picksLabel, checklistHeading, chec
           </p>
         </div>
       </div>
-      <div className="self-start rounded-[var(--radius-object)] border border-rule bg-surface p-7 sm:p-9">
+      <div className="self-start rounded-[8px] bg-ground-2 p-7 sm:p-9">
         <h2 className="text-title">{checklistHeading}</h2>
-        <ol className="mt-5 divide-y divide-rule border-t border-rule">
-          {checklist.map((c, i) => (
-            <li key={c} className="flex py-4 text-body">
-              <span className="w-7 shrink-0 text-small font-[600] text-ink-2">{i + 1}</span>
+        <ol className="mt-5 space-y-1">
+          {checklist.map((c) => (
+            <li key={c} className="rounded-[6px] bg-surface px-4 py-3 text-body">
               {c}
             </li>
           ))}

@@ -50,8 +50,8 @@ export const goAhead = {
 
 export const companyHero = {
   kicker: "AI and automation for family-owned companies · Toronto",
-  headline: "The AI team your company doesn’t have to hire.",
-  sub: "In one two-hour session we map where your company’s hours go. Then every month we build and run the automations that give them back: quotes, orders, customer questions, invoices. On your own systems.",
+  headline: "The AI team you don’t hire",
+  sub: "No new hires. In one two-hour session we map where your company’s hours go, then every month we build and run the automations that give them back: quotes, orders, customer questions, invoices. On your own systems.",
   secondary: "How the Map works",
   fine: `From ${partner.priceLabel} ${partner.per} · ${partner.termLine.toLowerCase()}`,
   imageAlt: "An industrial pressure gauge on a steel workbench in early-morning light",
@@ -63,7 +63,7 @@ export const companyHero = {
 };
 
 export const mapSession = {
-  lines: ["Two hours.", "Every", "department."],
+  lines: ["Two hours.", "Every department."],
   card: {
     title: "The Map session",
     body: "Your leadership and Peter, around one table. You leave with every department’s busywork written down and ranked by the hours it costs you.",
@@ -207,7 +207,7 @@ export const breakEven = {
 };
 
 export const trust = {
-  heading: "Built for companies that have been around a while.",
+  heading: "Built for companies with history",
   imageAlt: "An old red-brick factory building on an industrial street at dawn, with the Toronto skyline behind it",
   points: [
     { title: "Your systems, your data.", body: "We work inside what you already run: Microsoft 365 or Google, your ERP, your shared drives. Nothing moves to a platform we own." },

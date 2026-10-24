@@ -25,7 +25,7 @@ export const packs: Pack[] = [
   {
     id: "solopreneur",
     persona: "Solopreneur",
-    title: "10 agents for running a business of one",
+    title: "Ten agents for a business of one",
     status: "live",
     blurb: "The ten setups that show up most often in the library for people who run everything themselves. Works with Muse, Grok Bot, Hark or any agent that can read your email and calendar.",
     agents: [

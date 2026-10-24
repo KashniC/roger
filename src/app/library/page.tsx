@@ -2,31 +2,22 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
 import { StickyCta } from "@/components/client-boot";
-import { NewsletterForm } from "@/components/forms";
-import { LockScreen } from "@/components/phone/lock-screen";
+import { WatchSentence } from "@/components/home/watch-sentence";
 import { LibraryBrowser, LibraryStatic } from "@/components/library-browser";
 import { getUseCases } from "@/lib/library-source";
 
 export const metadata: Metadata = {
-  title: { absolute: "Real AI assistant use cases · Roger" },
+  title: { absolute: "Real AI agent use cases · Roger" },
   description:
-    "What people’s AI assistants are actually doing: meal plans, school forms, forgotten gift cards, invoices and customer messages. Collected weekly from public posts, each linked to the original.",
+    "What people’s AI agents are actually doing: meal plans, school forms, forgotten gift cards, invoices and customer messages. Read from public posts every morning, each linked to the original.",
   alternates: { canonical: "/library" },
   openGraph: { url: "/library" },
 };
 
-function shortDate(iso: string) {
-  return new Date(`${iso}T12:00:00`).toLocaleDateString("en-CA", { month: "short", day: "numeric" });
-}
-
-function longDate(iso: string) {
-  return new Date(`${iso}T12:00:00`).toLocaleDateString("en-CA", { month: "long", day: "numeric", year: "numeric" });
-}
-
 function SetUpBand() {
   return (
-    <div className="on-night grid gap-8 rounded-[var(--radius-object)] bg-night p-8 text-night-ink sm:p-10 md:grid-cols-[1.2fr_1fr] md:items-center">
-      <h2 className="text-h3">Want some of these working for you this week?</h2>
+    <div className="on-night grid gap-8 rounded-[8px] bg-night p-8 text-night-ink sm:p-10 md:grid-cols-[1.2fr_1fr] md:items-center">
+      <h2 className="text-h3">Want these working for you?</h2>
       <div className="flex flex-wrap items-center gap-x-7 gap-y-4">
         <Link href="/packs/solopreneur" className="btn btn-m btn-light">
           Get the free pack
@@ -41,44 +32,34 @@ function SetUpBand() {
 
 export default async function LibraryPage() {
   const items = await getUseCases();
-  const latest = items.reduce((m, u) => (u.weekOf > m ? u.weekOf : m), "0000-00-00");
-  const newest = items.filter((u) => u.weekOf === latest && u.outcome !== "honest-miss").slice(0, 3);
 
   return (
     <>
-      <section aria-labelledby="library-title" className="wrap grid grid-cols-[minmax(0,1fr)] gap-10 pb-10 pt-10 md:pb-14 md:pt-16 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-end lg:gap-16">
-        <div>
-          <p className="text-small font-[560] text-ink-2">
-            {items.length} use cases · <span className="sm:hidden">updated {shortDate(latest)}</span>
-            <span className="hidden sm:inline">last added the week of {longDate(latest)}</span>
+      <section aria-labelledby="library-title" className="wrap grid grid-cols-[minmax(0,1fr)] gap-6 pb-10 pt-10 md:pt-14 lg:grid-cols-[minmax(0,6fr)_minmax(0,6fr)] lg:items-end lg:gap-16">
+        <h1 id="library-title" className="lines text-h2 text-stretch-display">
+          <span className="line">
+            <span data-line style={{ "--i": 0 } as React.CSSProperties}>
+              The use-case
+            </span>
+          </span>
+          <span className="line">
+            <span data-line style={{ "--i": 1 } as React.CSSProperties}>
+              library
+            </span>
+          </span>
+        </h1>
+        <div className="after-lines">
+          <p className="text-lead">
+            {items.length.toLocaleString("en-CA")} real things people’s agents did, in our words, each linked to the person’s own post. Read from public posts every morning. None of them are Roger clients.
           </p>
-          <h1 id="library-title" className="mt-3 max-w-[16ch] text-h2 text-stretch-display sm:mt-4 sm:text-display">
-            Real-world AI assistant use cases.
-          </h1>
-          <p className="mt-4 max-w-[36rem] text-lead text-ink-2 sm:mt-6">
-            Collected weekly from public posts. Not Roger clients.<span className="hidden sm:inline"> Each one is in our words, credits its author and links to the original.</span>
-          </p>
-          <p id="hero-cta" className="mt-5 flex flex-wrap items-center gap-x-6 gap-y-3 text-small sm:mt-7">
+          <p className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-3">
             <Link href="/packs/solopreneur" className="btn btn-m">
               Get the free starter pack
             </Link>
-            <Link href="/#watch" className="tlink chev">
+            <Link href="#watch" className="tlink chev">
               Watch for what you need
             </Link>
           </p>
-        </div>
-        <div className="hidden h-[400px] lg:block">
-          <LockScreen
-            variant="crop"
-            scene="morning"
-            date={`Week of ${longDate(latest).replace(/, \d{4}$/, "")}`}
-            time="9:41"
-            uid="library"
-            arrive="stagger"
-            expanded={3}
-            notes={newest.map((u) => ({ id: u.id, app: u.tool || "Assistant", title: u.title, time: u.handle, body: u.summary }))}
-            label={`This week’s newest use cases: ${newest.map((u) => u.title).join("; ")}`}
-          />
         </div>
       </section>
 
@@ -86,17 +67,15 @@ export default async function LibraryPage() {
         <LibraryBrowser items={items} band={<SetUpBand />} />
       </Suspense>
 
-      <section id="final-cta" aria-label="Keep up" className="wrap pb-24 md:pb-32">
-        <div className="grid gap-8 border-t border-rule pt-10 md:grid-cols-[1fr_auto] md:items-end">
-          <NewsletterForm forValue="home" />
-          <p className="flex flex-wrap gap-x-6 gap-y-2 text-small">
-            <Link href="/packs/solopreneur" className="tlink chev">
-              Free starter pack
-            </Link>
-            <Link href="/setup" className="tlink chev">
-              Custom setup, $500
-            </Link>
-          </p>
+      <section id="watch" aria-labelledby="watch-title" className="wrap scroll-mt-32 pb-8 pt-16 md:pt-24">
+        <div id="final-cta" data-reveal>
+        <h2 id="watch-title" className="text-h2">
+          Not in the library yet?
+        </h2>
+        <div className="mt-6">
+          <WatchSentence />
+        </div>
+        <p className="mt-6 max-w-[36rem] text-small text-ink-2">The morning someone’s agent does it, you get one email with the link. Every email has a link to stop.</p>
         </div>
       </section>
 
