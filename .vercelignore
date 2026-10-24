@@ -1,0 +1,4 @@
+design/
+.next/
+node_modules/
+*.log
