@@ -18,6 +18,8 @@ export const CATEGORIES = [
   "learning",
   "staff",
   "shop-ops",
+  "teams",
+  "homework",
 ] as const;
 
 export const PERSONAS = ["solopreneur", "household", "caregiving", "business", "everyone"] as const;
