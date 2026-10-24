@@ -171,8 +171,8 @@ export default async function PackPage({ params }: PageProps<"/packs/[id]">) {
           <div>
             <h1 className="lines text-[clamp(2.5rem,4.8vw,4.5rem)] font-[650] leading-[1] tracking-[-0.045em] text-stretch-display">
               {lines.map((l, i) => (
-                <span key={l} className="line">
-                  <span data-line style={{ "--i": i } as React.CSSProperties}>
+                <span key={l} className="line block">
+                  <span data-line className="block" style={{ "--i": i } as React.CSSProperties}>
                     {l}
                   </span>
                 </span>

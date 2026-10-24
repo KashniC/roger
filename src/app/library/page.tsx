@@ -37,13 +37,13 @@ export default async function LibraryPage() {
     <>
       <section aria-labelledby="library-title" className="wrap grid grid-cols-[minmax(0,1fr)] gap-6 pb-10 pt-10 md:pt-14 lg:grid-cols-[minmax(0,6fr)_minmax(0,6fr)] lg:items-end lg:gap-16">
         <h1 id="library-title" className="lines text-h2 text-stretch-display">
-          <span className="line">
-            <span data-line style={{ "--i": 0 } as React.CSSProperties}>
+          <span className="line block">
+            <span data-line className="block" style={{ "--i": 0 } as React.CSSProperties}>
               The use-case
             </span>
           </span>
-          <span className="line">
-            <span data-line style={{ "--i": 1 } as React.CSSProperties}>
+          <span className="line block">
+            <span data-line className="block" style={{ "--i": 1 } as React.CSSProperties}>
               library
             </span>
           </span>

@@ -203,13 +203,13 @@ export default async function SetupPage({ searchParams }: PageProps<"/setup">) {
             id="hero-title"
             className="lines text-display text-stretch-display"
           >
-            <span className="line">
-              <span data-line style={{ "--i": 0 } as React.CSSProperties}>
+            <span className="line block">
+              <span data-line className="block" style={{ "--i": 0 } as React.CSSProperties}>
                 Your agents,
               </span>
             </span>
-            <span className="line">
-              <span data-line style={{ "--i": 1 } as React.CSSProperties}>
+            <span className="line block">
+              <span data-line className="block" style={{ "--i": 1 } as React.CSSProperties}>
                 set up for you
               </span>
             </span>

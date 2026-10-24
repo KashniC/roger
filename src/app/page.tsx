@@ -88,13 +88,13 @@ export default async function LibraryHome() {
               id="hero-title"
               className="lines text-[clamp(2.75rem,4.6vw,4.5rem)] md:whitespace-nowrap font-[650] leading-[0.98] tracking-[-0.045em] text-stretch-display"
             >
-              <span className="line">
-                <span data-line style={{ "--i": 0 } as React.CSSProperties}>
+              <span className="line block">
+                <span data-line className="block" style={{ "--i": 0 } as React.CSSProperties}>
                   What people’s
                 </span>
               </span>
-              <span className="line">
-                <span data-line style={{ "--i": 1 } as React.CSSProperties}>
+              <span className="line block">
+                <span data-line className="block" style={{ "--i": 1 } as React.CSSProperties}>
                   AI agents do
                 </span>
               </span>
