@@ -87,3 +87,30 @@ create table if not exists secrets (
   value text not null,
   updated_at timestamptz not null default now()
 );
+
+-- One row per post in the Lomax sheet. The sheet is the source of truth; this
+-- tracks what Roger has done with each row so the hourly sync only rewrites
+-- what's new or changed. state: pending (needs the AI rewrite), live (in
+-- use_cases), excluded (tag or tab not for the library), hidden (deleted in
+-- /admin, so not re-added), error (rewrite failed; retried next run).
+create table if not exists sheet_posts (
+  post_id text primary key,
+  url text not null,
+  tab text not null default '',
+  category text,
+  tag text not null default '',
+  handle text not null default '',
+  agent text not null default '',
+  summary text not null default '',
+  posted_at timestamptz,
+  likes int,
+  views int,
+  reposts int,
+  used_in_post text not null default '',
+  state text not null default 'pending' check (state in ('pending', 'live', 'excluded', 'hidden', 'error')),
+  use_case_id text,
+  error text,
+  first_seen timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+create index if not exists sheet_posts_state on sheet_posts (state);

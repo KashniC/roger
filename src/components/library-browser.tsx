@@ -8,6 +8,8 @@ import { UseCaseCard } from "./use-case-card";
 
 type For = "all" | "home" | "work";
 
+const PAGE = 60;
+
 export function LibraryBrowser({ items, band }: { items: UseCase[]; band: React.ReactNode }) {
   const params = useSearchParams();
   const router = useRouter();
@@ -50,6 +52,12 @@ export function LibraryBrowser({ items, band }: { items: UseCase[]; band: React.
         (!needle || `${u.title} ${u.summary} ${u.tool} ${u.handle} ${u.category}`.toLowerCase().includes(needle)),
     );
   }, [items, audience, cat, query]);
+
+  // a page at a time: thousands of cards at once is slow on a phone
+  // (back to one page whenever the filters change)
+  const filterKey = `${audience}|${cat}|${query}`;
+  const [page, setPage] = useState({ key: filterKey, shown: PAGE });
+  const shown = page.key === filterKey ? page.shown : PAGE;
 
   const chip = (on: boolean) =>
     `chip inline-flex min-h-10 shrink-0 items-center rounded-full border px-4 text-small font-[540] transition-colors ${
@@ -127,7 +135,7 @@ export function LibraryBrowser({ items, band }: { items: UseCase[]; band: React.
         }}
       >
         <p aria-live="polite" className="text-small text-ink-2">
-          {results.length === items.length ? `Showing all ${items.length} use cases.` : `Showing ${results.length} of ${items.length} use cases.`}
+          {results.length === items.length ? `${items.length} use cases.` : `${results.length} of ${items.length} use cases match.`}
         </p>
 
         {results.length === 0 ? (
@@ -147,7 +155,7 @@ export function LibraryBrowser({ items, band }: { items: UseCase[]; band: React.
           </div>
         ) : (
           <ul className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {results.map((u, i) => (
+            {results.slice(0, shown).map((u, i) => (
               <Fragment key={u.id}>
                 <li>
                   <UseCaseCard u={u} />
@@ -156,6 +164,13 @@ export function LibraryBrowser({ items, band }: { items: UseCase[]; band: React.
               </Fragment>
             ))}
           </ul>
+        )}
+        {results.length > shown && (
+          <div className="mt-10 flex justify-center">
+            <button type="button" onClick={() => setPage({ key: filterKey, shown: shown + PAGE })} className="btn btn-m btn-ink">
+              Show {Math.min(PAGE, results.length - shown)} more
+            </button>
+          </div>
         )}
       </div>
     </>
@@ -166,9 +181,9 @@ export function LibraryBrowser({ items, band }: { items: UseCase[]; band: React.
 export function LibraryStatic({ items }: { items: UseCase[] }) {
   return (
     <div className="wrap py-12 md:py-16">
-      <p className="text-small text-ink-2">Showing all {items.length} use cases.</p>
+      <p className="text-small text-ink-2">{items.length > PAGE ? `Showing the newest ${PAGE} of ${items.length} use cases.` : `Showing all ${items.length} use cases.`}</p>
       <ul className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        {items.map((u) => (
+        {items.slice(0, PAGE).map((u) => (
           <li key={u.id}>
             <UseCaseCard u={u} />
           </li>
