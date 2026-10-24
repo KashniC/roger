@@ -1,0 +1,486 @@
+@import "tailwindcss";
+
+/*
+ * Roger tokens. Every colour, size and curve on the site comes from here.
+ * Light pages with designed dark chapters (pricing, guarantee): the Apple
+ * product-page rhythm. Copper is the one accent, and its one job is "act":
+ * the primary button and text links.
+ */
+@theme static {
+  /* Ground and ink */
+  --color-ground: #fbfbfd; /* page: morning light on a white wall */
+  --color-ground-2: #f3f3f5; /* alternate chapter */
+  --color-surface: #ffffff; /* things that float or are objects */
+  --color-ink: #1d1d1f;
+  --color-ink-2: #5d5d63; /* 5.9:1 on ground-2 */
+  --color-rule: #e2e2e6;
+  --color-rule-strong: #c7c7cd;
+
+  /* The one accent: Roger copper, from the toque mark */
+  --color-accent: #9a5226; /* 6.1:1 on ground, white on it 6.3:1 */
+  --color-accent-hover: #83431c;
+  --color-accent-ink: #ffffff;
+  --color-accent-wash: #f6ece4;
+
+  /* Night chapters */
+  --color-night: #0c0c0e;
+  --color-night-2: #19191c;
+  --color-night-ink: #f5f5f7;
+  --color-night-ink-2: #a3a3aa; /* 7.6:1 on night */
+  --color-night-rule: #2c2c31;
+  --color-accent-night: #e8a97f; /* copper lifted for dark grounds, 9.6:1 */
+
+  /* Status, only where state lives */
+  --color-error: #b3261e;
+
+  /* Type: Mona Sans, one family; width and weight do the contrast */
+  --font-sans: var(--font-mona), system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Liberation Sans", sans-serif;
+
+  --text-display: clamp(2.125rem, min(11.2vw, 2.2rem + 3.2vw, 9.4svh), 5.75rem);
+  --text-display--line-height: 1.02;
+  --text-display--letter-spacing: -0.042em;
+  --text-display--font-weight: 650;
+  --text-h2: clamp(2.25rem, min(3.6vw, 7svh), 3.5rem);
+  --text-h2--line-height: 1.06;
+  --text-h2--letter-spacing: -0.034em;
+  --text-h2--font-weight: 640;
+  --text-h3: 2rem;
+  --text-h3--line-height: 1.12;
+  --text-h3--letter-spacing: -0.03em;
+  --text-h3--font-weight: 640;
+  --text-poster: clamp(2.25rem, 1rem + 5.2vw, 5.75rem);
+  --text-poster--line-height: 0.88;
+  --text-poster--letter-spacing: -0.055em;
+  --text-poster--font-weight: 700;
+  --text-title: clamp(1.1875rem, 1.05rem + 0.45vw, 1.3125rem);
+  --text-title--line-height: 1.25;
+  --text-title--letter-spacing: -0.018em;
+  --text-title--font-weight: 620;
+  --text-lead: clamp(1.1875rem, 1.05rem + 0.45vw, 1.3125rem);
+  --text-lead--line-height: 1.45;
+  --text-lead--letter-spacing: -0.012em;
+  --text-body: 1.0625rem; /* 17px */
+  --text-body--line-height: 1.55;
+  --text-small: 0.9375rem; /* 15px */
+  --text-small--line-height: 1.5;
+  --text-meta: 0.8125rem; /* 13px: the floor */
+  --text-meta--line-height: 1.4;
+
+  /* Radius family, nested concentrically */
+  --radius-object: 28px; /* cards that are objects: a use case, the price */
+  --radius-inner: 18px;
+  --radius-control: 12px; /* inputs */
+  --radius-note: 20px; /* notifications */
+
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ease-spring: linear(0, 0.38 8%, 0.8 18%, 1.03 30%, 1.06 38%, 1.02 52%, 0.995 68%, 1);
+  /* a gauge needle: overshoots, settles, the way a real one does */
+  --ease-needle: linear(0, 0.22 6%, 0.66 14%, 1.06 24%, 1.12 30%, 1.05 40%, 0.98 52%, 1.01 66%, 1);
+
+  --breakpoint-xs: 26rem;
+}
+
+@layer base {
+  :root {
+    color-scheme: light;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+  html {
+    scroll-padding-top: 72px;
+  }
+  body {
+    background: var(--color-ground);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    line-height: var(--text-body--line-height);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-feature-settings: "ss01" 0;
+  }
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+    /* English fits at 320px by size; this only catches long translated words */
+    overflow-wrap: break-word;
+  }
+  p,
+  li,
+  dd {
+    text-wrap: pretty;
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 3px;
+    border-radius: 6px;
+  }
+  .on-night :focus-visible {
+    outline-color: var(--color-accent-night);
+  }
+  ::selection {
+    background: #f1d6c2;
+    color: var(--color-ink);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    html:focus-within {
+      scroll-behavior: smooth;
+    }
+  }
+}
+
+@layer components {
+  .wrap {
+    width: 100%;
+    max-width: 1180px;
+    margin-inline: auto;
+    padding-inline: 16px;
+  }
+  @media (min-width: 640px) {
+    .wrap {
+      padding-inline: 24px;
+    }
+  }
+  .wrap-wide {
+    width: 100%;
+    max-width: 1320px;
+    margin-inline: auto;
+    padding-inline: 16px;
+  }
+  @media (min-width: 640px) {
+    .wrap-wide {
+      padding-inline: 24px;
+    }
+  }
+
+  /* Buttons: a filled pill for the one action; everything else is a text link. */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4em;
+    border-radius: 999px;
+    font-weight: 550;
+    letter-spacing: -0.01em;
+    text-align: center;
+    text-wrap: balance;
+    line-height: 1.2;
+    padding-block: 0.5em;
+    white-space: nowrap;
+    max-width: 100%;
+    border: 1px solid transparent;
+    background: var(--color-accent);
+    color: var(--color-accent-ink);
+    transition:
+      background-color 160ms var(--ease-out),
+      transform 160ms var(--ease-out);
+    -webkit-tap-highlight-color: transparent;
+  }
+  .btn:hover {
+    background: var(--color-accent-hover);
+  }
+  .btn:active {
+    transform: scale(0.98);
+  }
+  .btn-l {
+    min-height: 52px;
+    padding-inline: 28px;
+    font-size: 1.0625rem;
+  }
+  .btn-m {
+    min-height: 44px;
+    padding-inline: 22px;
+    font-size: 0.9375rem;
+  }
+  .btn-s {
+    min-height: 32px;
+    padding-inline: 14px;
+    font-size: 0.8125rem;
+  }
+  .btn-ink {
+    background: var(--color-ink);
+  }
+  .btn-ink:hover {
+    background: #3a3a3e;
+  }
+  .btn-light {
+    background: var(--color-night-ink);
+    color: var(--color-night);
+  }
+  .btn-light:hover {
+    background: #ffffff;
+  }
+  .btn[aria-disabled="true"] {
+    background: var(--color-ground-2);
+    color: var(--color-ink-2);
+    border-color: var(--color-rule-strong);
+    cursor: not-allowed;
+  }
+
+  .tlink {
+    color: var(--color-accent);
+    font-weight: 500;
+    text-decoration: none;
+    border-radius: 4px;
+  }
+  .tlink:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-thickness: 1px;
+  }
+  /* Repeated per-card links stay quiet until you reach for them. */
+  .tlink-quiet {
+    color: var(--color-ink-2);
+    font-weight: 500;
+    border-radius: 4px;
+    transition: color 160ms var(--ease-out);
+  }
+  .tlink-quiet:hover,
+  .tlink-quiet:focus-visible {
+    color: var(--color-accent);
+  }
+  .on-night .tlink {
+    color: var(--color-accent-night);
+  }
+  .chev::after {
+    content: "\00a0›";
+    display: inline-block;
+    transition: transform 160ms var(--ease-out);
+  }
+  .chev:hover::after {
+    transform: translateX(2px);
+  }
+
+  /* Horizontal shelves line their first card up with the page column. */
+  .rail {
+    --g: 16px;
+    padding-inline: max(var(--g), calc((100% - 1180px) / 2 + var(--g)));
+    scroll-padding-inline: max(var(--g), calc((100% - 1180px) / 2 + var(--g)));
+  }
+  @media (min-width: 640px) {
+    .rail {
+      --g: 24px;
+    }
+  }
+
+  .hairline {
+    border-color: var(--color-rule);
+  }
+
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .sr-only-focusable:not(:focus):not(:focus-within) {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+}
+
+@layer utilities {
+  .text-stretch-wide {
+    font-stretch: 108%;
+  }
+  .text-stretch-display {
+    font-stretch: 104%;
+  }
+  .scrollbar-none {
+    scrollbar-width: none;
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@media (max-width: 639px) {
+  .btn {
+    white-space: normal;
+  }
+}
+
+@media (max-width: 767px) {
+  html[data-sticky="on"] .header-cta {
+    visibility: hidden;
+  }
+}
+
+@media (forced-colors: active) {
+  .btn,
+  .chip {
+    border: 1px solid ButtonText;
+  }
+  /* Selected state survives when backgrounds are removed */
+  [aria-pressed="true"],
+  [aria-selected="true"] {
+    outline: 2px solid Highlight;
+    outline-offset: 1px;
+  }
+}
+
+/* The Chief of Staff window: the brief fills in, then the assistant asks. */
+@media (prefers-reduced-motion: no-preference) {
+  /* the window is product UI: it shows its state, no entrance */
+}
+@keyframes cw-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Photography: one grade for every generated image, and the grain over it.
+ */
+.photo-grade {
+  filter: saturate(0.92) contrast(1.03);
+}
+/* the element carrying .grain sets its own position (relative or absolute) */
+.grain::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.12;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+@media (prefers-reduced-motion: no-preference) {
+  .js .photo-drift {
+    animation: photo-drift 26s ease-in-out infinite alternate;
+  }
+}
+@keyframes photo-drift {
+  to {
+    transform: scale(1.045) translate3d(-0.8%, 0, 0);
+  }
+}
+
+/* The lit card: light under the surface, from one side (finish.md §3). */
+.lit-card {
+  color: #fff;
+  background:
+    radial-gradient(72% 62% at 82% 104%, rgb(226 128 70 / 0.5), transparent 70%),
+    radial-gradient(60% 60% at 18% -4%, rgb(255 255 255 / 0.1), transparent 60%),
+    linear-gradient(160deg, #2a211d, #120f0d);
+  box-shadow:
+    inset 0 0 0 1px rgb(255 255 255 / 0.12),
+    0 40px 80px -30px rgb(20 10 5 / 0.65);
+}
+/* Text sits over most of the card: the glow stays low and to the corner */
+.lit-card-calm {
+  background:
+    radial-gradient(48% 38% at 96% 106%, rgb(226 128 70 / 0.34), transparent 70%),
+    linear-gradient(160deg, #2a211d, #120f0d);
+}
+@media (forced-colors: active) {
+  .lit-card {
+    border: 1px solid CanvasText;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .js .rise-in > * {
+    animation: rise-in 700ms var(--ease-spring) both;
+  }
+  .js .rise-in > *:nth-child(2) { animation-delay: 120ms; }
+  .js .rise-in > *:nth-child(3) { animation-delay: 240ms; }
+  .js .rise-in > *:nth-child(4) { animation-delay: 360ms; }
+  .js .rise-in > *:nth-child(5) { animation-delay: 480ms; }
+}
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translate3d(16px, 0, 0);
+  }
+}
+
+/* The dusk chapter: Toronto at the end of the day, owned by the gauge section. */
+.dusk-ground {
+  background: linear-gradient(180deg, #2b3350 0%, #56607b 30%, #a2847f 48%, #3b2f34 64%, #0e0d11 100%);
+}
+
+/* The glass gauge: chrome bezel, a dark glass face lit from below, a needle on a spring. */
+.gauge {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  padding: 3.2%;
+  background: conic-gradient(from 210deg, #8b9099, #eceef2 16%, #7a7f88 34%, #d8dbe0 54%, #6c717a 74%, #e3e6ea 90%, #8b9099);
+  box-shadow:
+    0 50px 90px -40px rgb(0 0 0 / 0.8),
+    inset 0 0 0 1px rgb(255 255 255 / 0.45);
+}
+.gauge-face {
+  position: relative;
+  height: 100%;
+  border-radius: 50%;
+  overflow: hidden;
+  container-type: inline-size;
+  background:
+    radial-gradient(46% 30% at 50% 80%, rgb(232 150 92 / 0.55), transparent 70%),
+    radial-gradient(62% 52% at 50% 50%, #232327, #0f0f12 76%);
+  box-shadow:
+    inset 0 0 0 1px rgb(255 255 255 / 0.18),
+    inset 0 18px 46px rgb(255 255 255 / 0.07);
+}
+.gauge-face::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(70% 38% at 34% 10%, rgb(255 255 255 / 0.26), transparent 62%);
+  pointer-events: none;
+}
+.gauge-face svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.gauge-needle {
+  transform-origin: 250px 250px;
+  transform: rotate(var(--angle));
+}
+@media (prefers-reduced-motion: no-preference) {
+  /* the needle rests at zero until its gauge is on screen, then springs to the reading
+     and eases to every change after that, overshooting a little like a real one */
+  .gauge-needle {
+    transition: transform 760ms;
+    transition-timing-function: var(--ease-needle);
+  }
+  .js .gauge-idle .gauge-needle {
+    transform: rotate(-135deg);
+  }
+}
+.gauge-read {
+  position: absolute;
+  inset: 54% 0 auto;
+  text-align: center;
+  color: #f5f5f7;
+}
+@media (forced-colors: active) {
+  .gauge,
+  .gauge-face {
+    forced-color-adjust: none;
+    outline: 1px solid CanvasText;
+  }
+}
+
+/* Failsafe: load-time entrances end in their final state, even on a slow device */
+.settled .ph-stagger .ph-arrive,
+.settled .ph-stagger .ph-tick,
+.settled .lit-card .rise-in > * {
+  animation: none !important;
+}
+
+/* Headings: words never split mid-word (the user's rule); sizes are set so English fits at 320px */
+h1,
+h2 {
+  overflow-wrap: normal;
+  word-break: normal;
+}

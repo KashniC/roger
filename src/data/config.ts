@@ -1,60 +1,101 @@
-// Single source of truth for brand, prices, links and proof slots (spec §8).
-// Framework-free: the Node launch-check script imports this file, so no import.meta, JSX or asset imports.
-// Every empty value hides its element or shows "Opening soon" (spec §8.1). Track TODOs in src/data/launch.ts.
+/**
+ * Everything Peter edits by hand lives here. Anything in this file ships to the
+ * browser, so never put a secret or the work-balance Payment Link in it.
+ *
+ * Empty strings hide the element that uses them (see README → "Empty values").
+ */
 export const siteConfig = {
-  productName: 'Roger',
-  domain: 'https://meetroger.ai',
+  productName: "Roger",
+  domain: "https://meetroger.ai",
   founder: {
-    name: 'Peter',
-    photo: '', // optional (owner dropped it from launch, 2026-10-09); hidden when empty
-    city: 'Toronto',
-    links: [] as { label: string; href: string }[] // e.g. X, LinkedIn
+    name: "Peter",
+    /** Full name for the company pages, e.g. "Peter K…". Falls back to name. */
+    fullName: "" as string,
+    /** A direct line for company clients, e.g. "+1 416 555 0100". Hidden while empty. */
+    phone: "" as string,
+    /** Three or four true lines about what Peter has built. Shown once flags.bioApproved is true. */
+    bio: [
+      "A background in coding education: years teaching people to build with new tools.",
+    ] as string[],
+    photo: "" as string, // e.g. "/peter.jpg" (square, at least 480px). Hidden while empty.
+    city: "Toronto",
+    links: [] as { label: string; href: string }[], // e.g. { label: "X", href: "https://x.com/…" }
   },
-  contactEmail: 'hello@meetroger.ai',
-  headline: 'A' as 'A' | 'B' | 'C',
-  // After the founding 10 (spec §3.1): $3,000 work and $750 home. Both are paid in full up front
-  // (owner decision, 2026-10-09), so there is no deposit or balance.
+  contactEmail: "hello@meetroger.ai",
+
   prices: {
     work: 2000,
     home: 500,
     regularWork: 3000,
     regularHome: 750,
-    currency: 'CAD' as const
+    currency: "CAD",
   },
-  anchor: { adminHourly: 0, source: '' }, // TODO(Peter): sourced Toronto admin hourly rate; hidden if 0
-  founding: { total: 10, spotsLeft: 10, perk: 'a free 60-day tune-up session' },
-  capacityLine: 'We take 3 setups a week',
+  /** The v1 ladder. Payment links stay empty until Peter creates them; booking works now. */
+  ladder: {
+    setupPrice: 500,
+    planPrice: 50,
+    setupCheckout: "" as string, // Stripe Payment Link for the $500 setup
+    planCheckout: "" as string, // Stripe Payment Link for the $50/mo plan
+    setupCall: "https://cal.com/peter.k/roger-fit-call",
+  },
+  founding: { total: 10, spotsLeft: 10, perk: "a free 60-day tune-up session" },
+  capacityLine: "We take 3 setups a week",
   speed: { fitCallDays: 1, session1Days: 2, liveDays: 5, homeSessionLeadDays: 3 },
-  providerCostRange: '', // optional: e.g. "$20–$40", shown only in the "cost after setup" FAQs; hidden if empty
-  taxNote: 'Prices in CAD. No HST is charged.', // HST wording (owner: small supplier, confirmed 2026-10-09)
+
+  /** e.g. "$20–$40". Hidden while empty. */
+  providerCostRange: "",
+  /** Sourced Toronto admin hourly rate. The admin-cost anchor hides while 0. */
+  anchor: { adminHourly: 0, source: "" },
+  taxNote: "Prices in CAD. No HST is charged.",
+
   stripe: {
-    workDeposit: 'https://buy.stripe.com/eVq28keXBgxScuT8Zx8g00n', // $2,000 work Payment Link (paid in full): "Skip the call" + pasted on fit calls
-    homeCheckout: 'https://buy.stripe.com/14AcMY8zda9u1Qf3Fd8g00o', // $500 Payment Link (on /home only)
-    // Regular prices (spec §3.4): once founding.spotsLeft hits 0 the CTAs switch to these. Empty → "Opening soon".
-    workDepositRegular: '', // $3,000 work Payment Link used once founding spots are full
-    homeCheckoutRegular: '' // $750 home Payment Link used once founding spots are full
+    /** Full $2,000 work setup (founding). Stripe redirects to /thanks/work. */
+    workCheckout: "https://buy.stripe.com/eVq28keXBgxScuT8Zx8g00n",
+    /** Full $500 home setup (founding). Stripe redirects to /thanks/home. */
+    homeCheckout: "https://buy.stripe.com/14AcMY8zda9u1Qf3Fd8g00o",
+    /** Swap in once founding spots hit 0. */
+    workCheckoutRegular: "",
+    homeCheckoutRegular: "",
   },
   cal: {
-    fitCall: 'https://cal.com/peter.k/roger-fit-call', // 20-min, public, slots every business day
-    workSession1: 'https://cal.com/peter.k/roger-session-1-90-minutes', // 90 min; shown only on /thanks/work, next 2 business days
-    homeSession: 'https://cal.com/peter.k/roger-session-1-60-minutes' // 60 min; shown only on /thanks/home
+    /** Intro call for companies. Until Peter makes a dedicated event, it uses the fit call. */
+    companyCall: "https://cal.com/peter.k/roger-fit-call",
+    fitCall: "https://cal.com/peter.k/roger-fit-call",
+    workSession1: "https://cal.com/peter.k/roger-session-1-90-minutes",
+    homeSession: "https://cal.com/peter.k/roger-session-1-60-minutes",
   },
-  forms: { workshopEndpoint: '', newsletterEndpoint: '' },
-  // Workshop group codes Peter has created in Stripe (as {GROUP}WORK / {GROUP}HOME promotion codes).
-  // Alphanumeric, uppercase, e.g. 'OSSINGTON'. A ?code= not in this list is ignored.
+  /** Formspree (or similar) endpoints. While empty, the forms fall back to email. */
+  forms: { workshopEndpoint: "", newsletterEndpoint: "" },
+  /** Workshop groups whose ?code= is honoured, e.g. ["OSSINGTON"]. Stripe codes are GROUP+WORK / GROUP+HOME. */
   workshopCodes: [] as string[],
+
   proof: {
     counter: { setups: 0, workshops: 0, refunds: 0 },
     endorsements: [] as { org: string; person: string; title: string; quote: string; logo?: string }[],
-    videos: [] as { src: string; poster: string; caption: string; captionsVtt: string; kind: 'demo' | 'testimonial' }[],
-    screenshots: [] as { src: string; caption: string }[],
+    videos: [] as { src: string; poster: string; caption: string; captionsVtt: string; kind: "demo" | "testimonial" }[],
+    screenshots: [] as { src: string; caption: string; width: number; height: number }[],
     stats: [] as { value: string; label: string }[],
-    sampleReport: '', // '/sample-setup-report.pdf'
-    reviewsUrl: ''
+    sampleReport: "", // "/sample-setup-report.pdf"
+    reviewsUrl: "",
   },
-  workshopHostPack: '', // '/workshop-host-pack.pdf'
-  analytics: { enabled: false, provider: 'plausible' as 'plausible' | 'ga4' },
-  accentColour: '#9A5226'
-};
+  workshopHostPack: "", // "/workshop-host-pack.pdf"
+  analytics: { enabled: false, provider: "plausible" as "plausible" | "ga4" },
+} as const;
+
+/**
+ * Launch flags. Copy that depends on an unconfirmed fact checks its flag and
+ * falls back (or hides) while it is false.
+ */
+export const flags = {
+  legalReviewed: true,
+  hstConfirmed: true,
+  futurePriceCommitted: true,
+  bioApproved: false,
+  foundingPerkConfirmed: true,
+  homeSessionLeadConfirmed: true,
+  libraryVerified: false,
+  /** The $10K/month partnership terms (data/company.ts) are Peter’s to confirm. */
+  companyTermsConfirmed: false,
+} as const;
 
 export type SiteConfig = typeof siteConfig;
