@@ -96,8 +96,7 @@ export function MapGauge({ departments, heading, sub, note }: { departments: Dep
             style={{ opacity: k === focused.image ? 1 : 0 }}
           />
         ))}
-        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(26,28,44,0.9)_0%,rgba(30,27,36,0.86)_46%,rgba(13,12,16,0.95)_100%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(50%_40%_at_75%_60%,rgba(232,150,92,0.16),transparent_70%)]" />
+        <div /* taste-skill-ignore: neutral scrim over a photo */ className="absolute inset-0 bg-[linear-gradient(180deg,rgba(18,18,20,0.9)_0%,rgba(18,18,20,0.86)_46%,rgba(12,12,14,0.95)_100%)]" />
       </div>
 
       <div className="wrap grid grid-cols-[minmax(0,1fr)] gap-12 py-24 md:py-32 lg:grid-cols-[minmax(0,1fr)_minmax(0,28rem)] lg:gap-16">
@@ -105,7 +104,7 @@ export function MapGauge({ departments, heading, sub, note }: { departments: Dep
           <h2 id="map-gauge-title" className="text-h2">
             {heading}
           </h2>
-          <p className="mt-4 max-w-[34rem] text-lead text-night-ink/80">{sub}</p>
+          <p className="mt-4 max-w-[34rem] text-lead text-night-ink">{sub}</p>
         </div>
 
         {/* The instrument: under the heading on phones, pinned beside the list on wide screens */}
@@ -124,7 +123,7 @@ export function MapGauge({ departments, heading, sub, note }: { departments: Dep
                       <span ref={readRef}>{total}</span>
                       <span className="ml-1 text-[0.38em] tracking-[-0.01em] text-night-ink-2">h</span>
                     </p>
-                    <p className="mt-1.5 text-[max(0.75rem,3.4cqw)] text-night-ink-2">a week · example</p>
+                    <p className="mt-1.5 text-[max(0.8125rem,3.4cqw)] text-night-ink-2">a week · example</p>
                   </>
                 }
               />
@@ -136,7 +135,7 @@ export function MapGauge({ departments, heading, sub, note }: { departments: Dep
         </div>
 
         <div className="lg:col-start-1">
-          <div role="group" aria-label="Departments" className="relative -mx-4 flex gap-2 overflow-x-auto px-4 pb-1 scrollbar-none sm:-mx-6 sm:px-6 lg:mx-0 lg:grid lg:grid-cols-2 lg:gap-0 lg:overflow-visible lg:border-t lg:border-white/15 lg:px-0">
+          <div data-ui role="group" aria-label="Departments" className="relative -mx-4 flex gap-2 overflow-x-auto px-4 pb-1 scrollbar-none sm:-mx-6 sm:px-6 lg:mx-0 lg:grid lg:grid-cols-2 lg:gap-0 lg:overflow-visible lg:border-t lg:border-white/15 lg:px-0">
             {departments.map((d) => {
               const isOn = on.includes(d.id);
               return (
@@ -166,11 +165,11 @@ export function MapGauge({ departments, heading, sub, note }: { departments: Dep
             })}
           </div>
 
-          <div className="mt-10" aria-live="polite">
+          <div data-ui className="mt-10" aria-live="polite">
             <p className="text-small font-[600] text-night-ink-2">
               {focused.name} · {hoursOf(focused)} hours a week
             </p>
-            <ul key={focused.id} className="rise-in mt-3 divide-y divide-white/12 border-y border-white/12">
+            <ul key={focused.id} className="mt-3 divide-y divide-white/12 border-y border-white/12">
               {focused.candidates.map((c) => (
                 <li key={c.task} className="grid grid-cols-[minmax(0,1fr)_auto] gap-x-6 gap-y-1.5 py-5">
                   <p className="text-title">{c.task}</p>
@@ -179,7 +178,7 @@ export function MapGauge({ departments, heading, sub, note }: { departments: Dep
                 </li>
               ))}
             </ul>
-            <p className="mt-5 text-meta text-night-ink-2">{note}</p>
+            <p className="mt-5 text-small text-night-ink-2">{note}</p>
           </div>
         </div>
       </div>

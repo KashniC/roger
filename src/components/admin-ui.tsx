@@ -51,7 +51,7 @@ const tabs = [
 export function AdminTabs() {
   const path = usePathname();
   return (
-    <nav aria-label="Admin" className="relative -mx-4 flex gap-1 overflow-x-auto px-4 scrollbar-none">
+    <nav aria-label="Admin" className="flex flex-wrap gap-1">
       {tabs.map((t) => {
         const on = t.href === "/admin" ? path === "/admin" : path.startsWith(t.href);
         return (

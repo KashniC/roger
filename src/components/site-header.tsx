@@ -64,18 +64,18 @@ export function SiteHeader() {
   }, [open]);
 
   return (
-    <header className="sticky top-0 z-40 border-b border-rule/80 bg-ground/80 backdrop-blur-xl backdrop-saturate-150 supports-[not(backdrop-filter:blur(1px))]:bg-ground">
+    <header className="sticky top-0 z-40 bg-ground">
       <a href="#main" className="sr-only-focusable absolute left-4 top-2 z-50 rounded-full bg-ink px-4 py-2 text-small text-ground">
         Skip to content
       </a>
-      <div className="wrap flex h-[52px] items-center gap-6">
+      <div className="wrap flex h-[60px] items-center gap-6">
         <Link href="/" className="-ml-1 flex items-center gap-2 rounded-md px-1 py-1 text-[1.0625rem] font-[620] tracking-[-0.015em]">
           <Toque className="size-[22px] text-accent" />
           Roger
         </Link>
 
         <nav aria-label="Main" className="ml-auto hidden md:block">
-          <ul className="flex items-center gap-7 text-meta text-ink-2">
+          <ul className="flex items-center gap-7 text-small text-ink-2">
             {nav.links.map((l) => {
               const active = l.href === path;
               return (
@@ -83,7 +83,7 @@ export function SiteHeader() {
                   <Link
                     href={l.href}
                     aria-current={active ? "page" : undefined}
-                    className={`rounded px-0.5 py-1 transition-colors hover:text-ink ${active ? "text-ink" : ""}`}
+                    className={`rounded px-0.5 py-1 transition-colors duration-[180ms] hover:text-ink ${active ? "text-ink" : ""}`}
                   >
                     {l.label}
                   </Link>
@@ -97,12 +97,12 @@ export function SiteHeader() {
           {nav.cta && (
             <span className="header-cta">
               {nav.cta.href ? (
-                <Link href={nav.cta.href} className="btn btn-s">
+                <Link href={nav.cta.href} className="btn btn-m">
                   <span className="hidden sm:inline">{nav.cta.label}</span>
                   <span className="sm:hidden">{nav.cta.short}</span>
                 </Link>
               ) : (
-                <ActionLink kind={nav.cta.kind!} location="header" size="s" picksFor={nav.cta.picksFor}>
+                <ActionLink kind={nav.cta.kind!} location="header" size="m" picksFor={nav.cta.picksFor}>
                   <span className="hidden sm:inline">{nav.cta.label}</span>
                   <span className="sm:hidden">{nav.cta.short}</span>
                 </ActionLink>
@@ -126,11 +126,11 @@ export function SiteHeader() {
       </div>
 
       {open && (
-        <div id="mobile-menu" ref={menuRef} className="border-t border-rule bg-ground md:hidden">
+        <div id="mobile-menu" ref={menuRef} className="bg-ground-2 md:hidden">
           <nav aria-label="Main" className="wrap py-3">
             <ul>
               {nav.links.map((l) => (
-                <li key={l.href} className="border-b border-rule last:border-0">
+                <li key={l.href}>
                   <Link href={l.href} className="flex min-h-12 items-center text-title" onClick={() => setOpen(false)}>
                     {l.label}
                   </Link>

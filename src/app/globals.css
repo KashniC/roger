@@ -61,18 +61,20 @@
   --text-lead--letter-spacing: -0.012em;
   --text-body: 1.0625rem; /* 17px */
   --text-body--line-height: 1.55;
-  --text-small: 0.9375rem; /* 15px */
+  --text-small: 1rem; /* 16px: running text never smaller */
   --text-small--line-height: 1.5;
   --text-meta: 0.8125rem; /* 13px: the floor */
   --text-meta--line-height: 1.4;
 
-  /* Radius family, nested concentrically */
-  --radius-object: 28px; /* cards that are objects: a use case, the price */
-  --radius-inner: 18px;
-  --radius-control: 12px; /* inputs */
-  --radius-note: 20px; /* notifications */
+  /* One corner for the whole site; buttons are the one exception, fully round */
+  --radius-object: 8px;
+  --radius-inner: 8px;
+  --radius-control: 8px;
+  --radius-note: 8px;
 
-  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1); /* entrances, hovers, UI under 600ms */
+  --ease-expo: cubic-bezier(0.16, 1, 0.3, 1); /* reveals of 800ms and longer, line rises */
+  --ease-soft: cubic-bezier(0.33, 1, 0.68, 1); /* slow drift on photographs */
   --ease-spring: linear(0, 0.38 8%, 0.8 18%, 1.03 30%, 1.06 38%, 1.02 52%, 0.995 68%, 1);
   /* a gauge needle: overshoots, settles, the way a real one does */
   --ease-needle: linear(0, 0.22 6%, 0.66 14%, 1.06 24%, 1.12 30%, 1.05 40%, 0.98 52%, 1.01 66%, 1);
@@ -191,7 +193,7 @@
   .btn-m {
     min-height: 44px;
     padding-inline: 22px;
-    font-size: 0.9375rem;
+    font-size: 1rem;
   }
   .btn-s {
     min-height: 32px;
@@ -322,17 +324,6 @@
   }
 }
 
-/* The Chief of Staff window: the brief fills in, then the assistant asks. */
-@media (prefers-reduced-motion: no-preference) {
-  /* the window is product UI: it shows its state, no entrance */
-}
-@keyframes cw-in {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-}
-
 /* ---------------------------------------------------------------------------
  * Photography: one grade for every generated image, and the grain over it.
  */
@@ -361,59 +352,13 @@
   }
 }
 
-/* The lit card: light under the surface, from one side (finish.md §3). */
-.lit-card {
-  color: #fff;
-  background:
-    radial-gradient(72% 62% at 82% 104%, rgb(226 128 70 / 0.5), transparent 70%),
-    radial-gradient(60% 60% at 18% -4%, rgb(255 255 255 / 0.1), transparent 60%),
-    linear-gradient(160deg, #2a211d, #120f0d);
-  box-shadow:
-    inset 0 0 0 1px rgb(255 255 255 / 0.12),
-    0 40px 80px -30px rgb(20 10 5 / 0.65);
-}
-/* Text sits over most of the card: the glow stays low and to the corner */
-.lit-card-calm {
-  background:
-    radial-gradient(48% 38% at 96% 106%, rgb(226 128 70 / 0.34), transparent 70%),
-    linear-gradient(160deg, #2a211d, #120f0d);
-}
-@media (forced-colors: active) {
-  .lit-card {
-    border: 1px solid CanvasText;
-  }
-}
-@media (prefers-reduced-motion: no-preference) {
-  .js .rise-in > * {
-    animation: rise-in 700ms var(--ease-spring) both;
-  }
-  .js .rise-in > *:nth-child(2) { animation-delay: 120ms; }
-  .js .rise-in > *:nth-child(3) { animation-delay: 240ms; }
-  .js .rise-in > *:nth-child(4) { animation-delay: 360ms; }
-  .js .rise-in > *:nth-child(5) { animation-delay: 480ms; }
-}
-@keyframes rise-in {
-  from {
-    opacity: 0;
-    transform: translate3d(16px, 0, 0);
-  }
-}
-
-/* The dusk chapter: Toronto at the end of the day, owned by the gauge section. */
-.dusk-ground {
-  background: linear-gradient(180deg, #2b3350 0%, #56607b 30%, #a2847f 48%, #3b2f34 64%, #0e0d11 100%);
-}
-
-/* The glass gauge: chrome bezel, a dark glass face lit from below, a needle on a spring. */
+/* The gauge: a flat steel bezel, a dark face, a needle on a spring. */
 .gauge {
   position: relative;
   aspect-ratio: 1;
   border-radius: 50%;
   padding: 3.2%;
-  background: conic-gradient(from 210deg, #8b9099, #eceef2 16%, #7a7f88 34%, #d8dbe0 54%, #6c717a 74%, #e3e6ea 90%, #8b9099);
-  box-shadow:
-    0 50px 90px -40px rgb(0 0 0 / 0.8),
-    inset 0 0 0 1px rgb(255 255 255 / 0.45);
+  background: #c4c7cd;
 }
 .gauge-face {
   position: relative;
@@ -421,20 +366,7 @@
   border-radius: 50%;
   overflow: hidden;
   container-type: inline-size;
-  background:
-    radial-gradient(46% 30% at 50% 80%, rgb(232 150 92 / 0.55), transparent 70%),
-    radial-gradient(62% 52% at 50% 50%, #232327, #0f0f12 76%);
-  box-shadow:
-    inset 0 0 0 1px rgb(255 255 255 / 0.18),
-    inset 0 18px 46px rgb(255 255 255 / 0.07);
-}
-.gauge-face::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  background: radial-gradient(70% 38% at 34% 10%, rgb(255 255 255 / 0.26), transparent 62%);
-  pointer-events: none;
+  background: #141417;
 }
 .gauge-face svg {
   position: absolute;
@@ -473,8 +405,7 @@
 
 /* Failsafe: load-time entrances end in their final state, even on a slow device */
 .settled .ph-stagger .ph-arrive,
-.settled .ph-stagger .ph-tick,
-.settled .lit-card .rise-in > * {
+.settled .ph-stagger .ph-tick {
   animation: none !important;
 }
 
@@ -483,4 +414,87 @@ h1,
 h2 {
   overflow-wrap: normal;
   word-break: normal;
+}
+
+/* ---------------------------------------------------------------------------
+ * Motion (taste-skill motion.md): masked headline lines, reveal on scroll once,
+ * and one slow drift. Hidden states only exist under html.js with motion allowed.
+ */
+.lines .line {
+  display: block;
+  /* the mask is a little taller than the glyphs, so nothing is cut once the line has risen */
+  clip-path: inset(0 -1em 0 -1em);
+  padding-block: 0.16em 0.22em;
+  margin-block: -0.16em -0.22em;
+}
+.lines [data-line] {
+  display: block;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .js .lines [data-line] {
+    transform: translateY(135%);
+    animation: line-up 900ms var(--ease-expo) forwards;
+    animation-delay: calc(var(--i, 0) * 110ms + 150ms);
+  }
+  .js .after-lines {
+    opacity: 0;
+    animation: fade-up 700ms var(--ease-out) 520ms forwards;
+  }
+  .reveal-ready [data-reveal] > * {
+    opacity: 0;
+    transform: translateY(24px);
+    transition:
+      opacity 700ms var(--ease-out),
+      transform 900ms var(--ease-expo);
+  }
+  .reveal-ready [data-reveal].is-in > * {
+    opacity: 1;
+    transform: none;
+  }
+  .reveal-ready [data-reveal].is-in > *:nth-child(2) { transition-delay: 80ms; }
+  .reveal-ready [data-reveal].is-in > *:nth-child(3) { transition-delay: 160ms; }
+  .reveal-ready [data-reveal].is-in > *:nth-child(4) { transition-delay: 240ms; }
+  .js .drift {
+    animation: drift 28s var(--ease-soft) infinite alternate;
+  }
+}
+@keyframes line-up {
+  to {
+    transform: none;
+  }
+}
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes drift {
+  to {
+    transform: scale(1.06) translate3d(-1.2%, -0.6%, 0);
+  }
+}
+/* Failsafe: the load sequence ends in its final state even on a slow device.
+   Reveals hide nothing until their observer is running (html.reveal-ready). */
+.settled .lines [data-line],
+.settled .after-lines {
+  animation: none !important;
+  transform: none !important;
+  opacity: 1 !important;
+}
+
+/* The pricing stage swaps its contents in place */
+@media (prefers-reduced-motion: no-preference) {
+  .stage-swap {
+    animation: stage-in 200ms var(--ease-out);
+  }
+}
+@keyframes stage-in {
+  from {
+    opacity: 0;
+  }
 }

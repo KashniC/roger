@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { ActionLink } from "@/components/action-link";
-import { StickyCta } from "@/components/client-boot";
 import { ClosingPhoto, CompanyHero, MapSession, Measured, NinetyDays, PartnerPricing, PeterSection, TrustBand } from "@/components/company";
 import { MapGauge } from "@/components/map-gauge";
 import { FaqSection } from "@/components/sections";
@@ -63,7 +62,6 @@ export default function CompanyPage() {
         </div>
       </ClosingPhoto>
 
-      <StickyCta actions={[{ kind: "companyCall", label: "Book an intro call" }]} />
     </>
   );
 }

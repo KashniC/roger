@@ -11,8 +11,8 @@ export const winters: Prospect = {
   meeting: { label: "Wednesday, October 28 · 9:00 AM ET", subject: "Winters · Wednesday, October 28" },
   hero: {
     kicker: "Prepared for Winters Instruments",
-    headline: "An AI team for Winters, without hiring one.",
-    sub: "A starting point for our two hours together: what we heard, where we expect to look first, how the first 90 days would run, and what it costs.",
+    headline: "An AI team for Winters",
+    sub: "Without hiring one. A starting point for our two hours together: what we heard, where we expect to look first, how the first 90 days would run, and what it costs.",
   },
   heard: {
     heading: "What we heard.",

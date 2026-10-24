@@ -22,7 +22,7 @@ async function Gate({ children }: { children: React.ReactNode }) {
     );
   if (!(await isAdmin())) return <LoginForm />;
   return (
-    <div className="wrap-wide pb-24 pt-6">
+    <div className="wrap pb-24 pt-6">
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-rule pb-4">
         <AdminTabs />
         <form action={signOutAction}>
