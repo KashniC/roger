@@ -498,3 +498,228 @@ h2 {
     opacity: 0;
   }
 }
+
+/* ---------------------------------------------------------------------------
+ * Redesign 2026: the home page as a product story. Same copper, same Mona Sans;
+ * a mono face for interface labels, status colours for the illustrated UI, and
+ * one purposeful gradient: the dawn the library is read at.
+ */
+@theme static {
+  --color-night-3: #232327;
+  --color-ok: #2e7d4f;
+  --color-ok-night: #86d6a6;
+  --color-wait-night: #f3c47e;
+  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+@layer components {
+  .section {
+    padding-block: clamp(5.5rem, 11vw, 9.5rem);
+  }
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6em;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-ink-2);
+  }
+  .eyebrow::before {
+    content: "";
+    width: 14px;
+    height: 1.5px;
+    background: var(--color-accent);
+  }
+  .on-night .eyebrow {
+    color: var(--color-night-ink-2);
+  }
+  .on-night .eyebrow::before {
+    background: var(--color-accent-night);
+  }
+  .mono {
+    font-family: var(--font-mono);
+    letter-spacing: 0;
+  }
+
+  /* Secondary buttons: an outline, so the filled copper pill stays the one action */
+  .btn-ghost {
+    background: transparent;
+    color: var(--color-ink);
+    border-color: var(--color-rule-strong);
+  }
+  .btn-ghost:hover {
+    background: var(--color-ground-2);
+  }
+  .on-night .btn-ghost {
+    color: var(--color-night-ink);
+    border-color: rgb(255 255 255 / 0.22);
+  }
+  .on-night .btn-ghost:hover {
+    background: rgb(255 255 255 / 0.07);
+  }
+
+  /* Interface frames: real product (live) and illustrations both sit in one */
+  .window {
+    border-radius: 14px;
+    background: var(--color-night-2);
+    color: var(--color-night-ink);
+    box-shadow:
+      0 0 0 1px rgb(255 255 255 / 0.08),
+      0 1px 0 0 rgb(255 255 255 / 0.06) inset,
+      0 40px 80px -30px rgb(0 0 0 / 0.7);
+    overflow: clip;
+  }
+  .window-light {
+    border-radius: 14px;
+    background: var(--color-surface);
+    box-shadow:
+      0 0 0 1px rgb(0 0 0 / 0.07),
+      0 24px 60px -28px rgb(20 20 30 / 0.28);
+    overflow: clip;
+  }
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45em;
+    min-height: 24px;
+    padding-inline: 9px;
+    border-radius: 999px;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .live-dot {
+    position: relative;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--color-ok-night);
+    flex: none;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .live-dot::after {
+      content: "";
+      position: absolute;
+      inset: -4px;
+      border-radius: 50%;
+      border: 1.5px solid var(--color-ok-night);
+      animation: ping 2.4s var(--ease-out) infinite;
+    }
+  }
+}
+
+@keyframes ping {
+  from {
+    transform: scale(0.4);
+    opacity: 0.9;
+  }
+  to {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
+
+/* The hero's sunrise: a low copper glow on the horizon, nothing else */
+.hero-dawn {
+  position: absolute;
+  inset: auto 0 0;
+  height: 75%;
+  pointer-events: none;
+  background:
+    radial-gradient(55% 60% at 62% 100%, rgb(232 169 127 / 0.26), rgb(154 82 38 / 0.1) 45%, transparent 72%);
+}
+.hero-horizon {
+  position: absolute;
+  inset: auto 0 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgb(232 169 127 / 0.45) 50%, transparent);
+}
+
+/* A slow strip of names; static and wrapped when motion is reduced */
+.marquee {
+  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+}
+.marquee-track {
+  display: flex;
+  width: max-content;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .marquee-track {
+    animation: marquee 48s linear infinite;
+  }
+  .marquee:hover .marquee-track {
+    animation-play-state: paused;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .marquee {
+    mask-image: none;
+  }
+  .marquee-track {
+    flex-wrap: wrap;
+    width: auto;
+  }
+  .marquee-track > [aria-hidden="true"] {
+    display: none;
+  }
+}
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* Diagram connectors: dashes that drift toward the library */
+.flow {
+  stroke-dasharray: 3 7;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .flow {
+    animation: flow 1.6s linear infinite;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .flow-dot {
+    display: none;
+  }
+}
+@keyframes flow {
+  to {
+    stroke-dashoffset: -20;
+  }
+}
+
+/* Demo panels swap in place */
+@media (prefers-reduced-motion: no-preference) {
+  .swap-in {
+    animation: swap-in 420ms var(--ease-out) both;
+  }
+  .swap-in-late {
+    animation: swap-in 420ms var(--ease-out) 140ms both;
+  }
+}
+@keyframes swap-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+.progress-bar {
+  transform-origin: left;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .progress-run {
+    animation: progress var(--dur, 4200ms) linear forwards;
+  }
+}
+@keyframes progress {
+  from {
+    transform: scaleX(0);
+  }
+}

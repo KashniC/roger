@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Mona_Sans } from "next/font/google";
+import { Geist_Mono, Mona_Sans } from "next/font/google";
 import { siteConfig } from "@/data/config";
 import { offerNow } from "@/lib/offer";
 import { SiteHeader } from "@/components/site-header";
@@ -15,6 +15,14 @@ const mona = Mona_Sans({
   subsets: ["latin"],
   axes: ["wdth"],
   variable: "--font-mona",
+  display: "swap",
+});
+
+/** Interface labels only: timestamps, tags, step numbers. */
+const mono = Geist_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500"],
+  variable: "--font-geist-mono",
   display: "swap",
 });
 
@@ -67,7 +75,7 @@ function jsonLd() {
 export default async function RootLayout({ children }: LayoutProps<"/">) {
   const s = await getSettings();
   return (
-    <html lang="en-CA" className={mona.variable} suppressHydrationWarning>
+    <html lang="en-CA" className={`${mona.variable} ${mono.variable}`} suppressHydrationWarning>
       <head>
         {/* Entrances play only with JavaScript; without it the final, complete state renders. */}
         <script dangerouslySetInnerHTML={{ __html: "document.documentElement.classList.add('js');setTimeout(function(){document.documentElement.classList.add('settled')},3200)" }} />

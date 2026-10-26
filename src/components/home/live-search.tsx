@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useActionState, useEffect, useId, useState } from "react";
 import { saveWatch, type ActionState } from "@/app/library-actions";
+import { Icon } from "@/components/icons";
 import { ExternalIcon } from "@/components/use-case-card";
 import type { UseCase } from "@/data/library";
 import { trackEvent } from "@/lib/session";
@@ -74,10 +75,7 @@ export function LiveSearch({
       : "/library";
 
   return (
-    <div
-      data-ui
-      className="overflow-clip rounded-[10px] bg-night-2 text-night-ink"
-    >
+    <div data-ui className="text-night-ink">
       <form
         role="search"
         onSubmit={(e) => {
@@ -85,14 +83,16 @@ export function LiveSearch({
           trackEvent("library_search", { q: q.slice(0, 60) });
           window.location.assign(href);
         }}
-        className="px-5 pb-3 pt-4"
+        className="px-4 pb-3 pt-5 sm:px-5"
       >
         <label
           htmlFor={`${id}-q`}
-          className="block text-[0.875rem] text-night-ink-2"
+          className="mono block text-[0.75rem] uppercase tracking-[0.08em] text-night-ink-2"
         >
           I want my agent to…
         </label>
+        <div className="relative mt-2">
+        <Icon name="search" className="pointer-events-none absolute left-0 top-1/2 size-5 -translate-y-1/2 text-night-ink-2" />
         <input
           id={`${id}-q`}
           value={q}
@@ -100,14 +100,15 @@ export function LiveSearch({
           maxLength={160}
           autoComplete="off"
           placeholder="chase overdue invoices"
-          className="mt-1 w-full border-b border-white/20 bg-transparent pb-2 text-[1.5rem] font-[520] tracking-[-0.02em] text-night-ink outline-none placeholder:text-white/35 focus:border-accent-night"
+          className="w-full border-b border-white/15 bg-transparent pb-2.5 pl-8 pt-1 text-[clamp(1.25rem,2.4vw,1.5rem)] font-[520] tracking-[-0.02em] text-night-ink outline-none transition-colors placeholder:text-white/30 focus:border-accent-night"
         />
+        </div>
       </form>
 
       <div
         role="group"
         aria-label="Shelves"
-        className="flex flex-wrap gap-1.5 px-5 pb-3"
+        className="flex gap-1.5 overflow-x-auto px-4 pb-3 scrollbar-none sm:flex-wrap sm:px-5"
       >
         {[
           { id: "", label: "Everything", n: total },
@@ -120,7 +121,7 @@ export function LiveSearch({
               type="button"
               aria-pressed={on}
               onClick={() => setShelf(s.id || null)}
-              className={`chip min-h-9 shrink-0 rounded-[6px] px-3 text-[0.875rem] transition-colors duration-[180ms] ${on ? "bg-night-ink text-night" : "bg-white/[0.06] text-night-ink-2 hover:bg-white/[0.1] hover:text-night-ink"}`}
+              className={`chip min-h-9 shrink-0 rounded-full px-3.5 text-[0.8125rem] transition-colors duration-[180ms] ${on ? "bg-night-ink text-night" : "bg-white/[0.06] text-night-ink-2 hover:bg-white/[0.1] hover:text-night-ink"}`}
             >
               {s.label}{" "}
               <span className="tabular-nums opacity-70">
@@ -132,14 +133,14 @@ export function LiveSearch({
       </div>
 
       {shown.length > 0 ? (
-        <ul aria-live="polite" className="px-2 pb-2">
+        <ul aria-live="polite" className="min-h-[19.5rem] border-t border-white/[0.06] px-2 py-2">
           {shown.map((e) => (
             <li key={e.id}>
               <a
                 href={e.url}
                 target="_blank"
                 rel="noopener noreferrer nofollow"
-                className="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-4 rounded-[6px] px-3 py-2.5 transition-colors duration-[180ms] hover:bg-white/[0.07]"
+                className="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-4 rounded-[8px] px-3 py-2.5 transition-colors duration-[180ms] hover:bg-white/[0.06]"
               >
                 <span className="min-w-0">
                   <span className="block truncate text-[1rem] font-[560] tracking-[-0.01em]">
@@ -153,7 +154,7 @@ export function LiveSearch({
                   {e.tool && (
                     <span className="hidden sm:inline">{e.tool} ·</span>
                   )}
-                  {e.handle}
+                  <span className="hidden sm:inline">{e.handle}</span>
                   <ExternalIcon className="size-3" />
                 </span>
               </a>
@@ -161,9 +162,9 @@ export function LiveSearch({
           ))}
         </ul>
       ) : result?.key !== key ? (
-        <p className="px-5 pb-5 text-[1rem] text-night-ink-2">Searching…</p>
+        <p className="min-h-[19.5rem] border-t border-white/[0.06] px-5 py-5 text-[1rem] text-night-ink-2">Searching…</p>
       ) : state.status === "ok" ? (
-        <p role="status" className="px-5 pb-5 text-[1rem]">
+        <p role="status" className="min-h-[19.5rem] border-t border-white/[0.06] px-5 py-5 text-[1rem]">
           You’re on the watch list for “{q}”.{" "}
           {state.emailed
             ? "Check your email to confirm it."
@@ -173,7 +174,7 @@ export function LiveSearch({
         <form
           action={action}
           onSubmit={() => trackEvent("watch_submit")}
-          className="px-5 pb-5"
+          className="min-h-[19.5rem] border-t border-white/[0.06] px-5 py-5"
         >
           <p className="text-[1rem]">
             Nobody’s agent does that yet. Want an email the morning one does?
@@ -216,7 +217,7 @@ export function LiveSearch({
         </form>
       )}
 
-      <div className="flex items-center justify-between gap-4 bg-white/[0.04] px-5 py-3 text-[0.875rem] text-night-ink-2">
+      <div className="flex items-center justify-between gap-4 border-t border-white/[0.06] bg-white/[0.02] px-4 py-3 text-[0.875rem] text-night-ink-2 sm:px-5">
         <span className="tabular-nums" aria-live="polite">
           {key === "|"
             ? `${total.toLocaleString("en-CA")} in the library`
