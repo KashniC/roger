@@ -2,7 +2,6 @@
 
 import { useActionState, useEffect, useId, useState } from "react";
 import { saveWatch, type ActionState } from "@/app/library-actions";
-import { Icon } from "@/components/icons";
 import { trackEvent } from "@/lib/session";
 
 const idle: ActionState = { status: "idle" };
@@ -49,7 +48,7 @@ export function WatchForm() {
         <form action={action} onSubmit={() => trackEvent("watch_submit")} className="grid content-start gap-4">
           <div>
             <label htmlFor={`${id}-q`} className="block text-[0.9375rem] font-[600]">
-              What do you want your agent to do?
+              Your agent should…
             </label>
             <input
               id={`${id}-q`}
@@ -65,7 +64,7 @@ export function WatchForm() {
           </div>
           <div>
             <label htmlFor={`${id}-e`} className="block text-[0.9375rem] font-[600]">
-              Your email
+              Email
             </label>
             <input
               id={`${id}-e`}
@@ -88,7 +87,6 @@ export function WatchForm() {
               {state.message}
             </p>
           )}
-          <p className="text-[0.875rem] text-night-ink-2">One email the morning it shows up. Every email has a link to stop.</p>
         </form>
       )}
 
@@ -124,9 +122,7 @@ export function WatchForm() {
             </p>
           </div>
         </div>
-        <figcaption className="mt-3 flex items-center gap-1.5 text-[0.8125rem] text-night-ink-2">
-          <Icon name="mail" className="size-3.5" /> The email you’d get. The match is a live search of the library.
-        </figcaption>
+        <figcaption className="mt-3 text-[0.8125rem] text-night-ink-2">The email you’d get, matched live from the library</figcaption>
       </figure>
     </div>
   );

@@ -39,7 +39,7 @@ export function Leads({ stories }: { stories: UseCase[] }) {
               )}
               <span className={`mt-3 block font-[640] leading-tight tracking-[-0.02em] ${lead ? "text-[clamp(1.5rem,2.6vw,2.125rem)]" : "text-[1.25rem]"}`}>{after}</span>
               <span className="mono mt-4 block text-[0.8125rem] text-ink-2 transition-colors duration-150 group-hover:text-accent">
-                {u.tool} · {u.handle} ↗
+                {u.tool} ↗
               </span>
             </a>
           </li>

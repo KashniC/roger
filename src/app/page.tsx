@@ -7,8 +7,6 @@ import { LibraryBrowse, type Entry } from "@/components/home/library-browse";
 import { Leads, pickStories } from "@/components/home/stories";
 import { WatchForm } from "@/components/home/watch-form";
 import { Interest } from "@/components/pack-cards";
-import { siteConfig } from "@/data/config";
-import { setupFaqs } from "@/data/faq";
 import { categories, type UseCase } from "@/data/library";
 import { ladderFor } from "@/data/ladder";
 import { livePack, packs } from "@/data/packs";
@@ -49,8 +47,6 @@ function byShelf(list: UseCase[]) {
 
 /** The three facts about access; the detail lives on /setup. */
 const facts = ["By default it drafts; you approve.", "It runs on your own accounts.", "We keep no passwords."];
-/** The FAQ answers that belong next to the prices. */
-const PRICE_QS = ["Which agent do you set up?", "What does it cost after the setup?"];
 
 export default async function LibraryHome() {
   const [all, settings] = await Promise.all([getUseCases(), getSettings()]);
@@ -65,10 +61,8 @@ export default async function LibraryHome() {
   const shelves = byShelf(sorted.filter((u) => !shown.has(u.id)));
 
   const total = all.length;
-  const newest = sorted[0] && new Date(sorted[0].addedAt ?? sorted[0].weekOf).toLocaleDateString("en-CA", { weekday: "long", month: "long", day: "numeric", timeZone: "America/Toronto" });
   const plans = ladderFor(settings).rungs;
   const who = ["You set it up", "Peter sets it up, with you", "After a setup"];
-  const faqs = setupFaqs(settings.planPrice);
   const pack = livePack;
   const next = packs.filter((p) => p.status === "soon");
 
@@ -79,7 +73,6 @@ export default async function LibraryHome() {
         <div className="wrap">
           <p className="mono flex flex-wrap justify-between gap-x-6 gap-y-1 border-b-2 border-ink pb-3 text-[0.75rem] uppercase tracking-[0.08em]">
             <span>The morning edition</span>
-            {newest && <span className="hidden sm:inline">{newest}</span>}
             <span className="tabular-nums">{total.toLocaleString("en-CA")} use cases</span>
           </p>
 
@@ -88,13 +81,10 @@ export default async function LibraryHome() {
               <h1 id="hero-title" className="display text-[clamp(3.5rem,8vw,7.75rem)]">
                 What people’s AI agents <span className="text-accent">actually do.</span>
               </h1>
-              <p className="mt-7 max-w-[30rem] text-lead">Real use cases from public posts, read every morning. Set one up yourself for free, or have Peter do it.</p>
+              <p className="mt-7 max-w-[26rem] text-lead">Real use cases from public posts, collected every morning.</p>
               <div className="mt-7 flex flex-wrap items-center gap-x-6 gap-y-3">
                 <Link href={`/packs/${pack.id}`} className="btn btn-l">
                   Get the free 10-agent pack
-                </Link>
-                <Link href="/setup" className="tlink chev py-2">
-                  Or book a setup
                 </Link>
               </div>
             </div>
@@ -111,11 +101,9 @@ export default async function LibraryHome() {
       <section id="library" aria-labelledby="library-title" className="on-night scroll-mt-16 bg-night py-24 text-night-ink md:py-32">
         <div className="wrap grid grid-cols-[minmax(0,1fr)] gap-10 lg:grid-cols-[minmax(0,4fr)_minmax(0,8fr)] lg:gap-16">
           <div className="lg:sticky lg:top-24 lg:self-start">
-            <p className="mono text-[0.75rem] uppercase tracking-[0.08em] text-accent-night">The index</p>
-            <h2 id="library-title" className="display mt-4 text-[clamp(3rem,6vw,5.5rem)]">
+            <h2 id="library-title" className="display text-[clamp(3rem,6vw,5.5rem)]">
               <span className="tabular-nums">{total.toLocaleString("en-CA")}</span> things agents did.
             </h2>
-            <p className="mt-5 max-w-[22rem] text-night-ink-2">Every one rewritten in our words and linked to the public post it came from.</p>
             <Link href="/library" className="tlink chev mt-6 inline-block py-1">
               Open the full library
             </Link>
@@ -167,13 +155,13 @@ export default async function LibraryHome() {
                     {p.per && <span className="text-ink-2">{p.per}</span>}
                   </p>
                   <div className="text-[1rem] text-ink-2">
-                    <p>{i === 0 ? `Ten agents with the instructions to paste in. ${OPEN_IN_PACK} open now, the rest with your email.` : p.body}</p>
-                    <details className="group mt-2">
+                    <details className="group">
                       <summary className="flex min-h-10 cursor-pointer list-none items-center gap-2 text-[0.9375rem] font-[560] text-ink hover:text-accent [&::-webkit-details-marker]:hidden">
                         What’s included
                         <Icon name="plus" className="size-3.5 transition-transform duration-200 group-open:rotate-45" />
                       </summary>
-                      <ul className="mt-1 grid gap-1.5 text-[0.9375rem]">
+                      <p className="mt-1 text-[0.9375rem]">{i === 0 ? `Ten agents with the instructions to paste in. ${OPEN_IN_PACK} open now, the rest with your email.` : p.body}</p>
+                      <ul className="mt-2 grid gap-1.5 text-[0.9375rem]">
                         {p.includes.map((x) => (
                           <li key={x}>— {x}</li>
                         ))}
@@ -188,21 +176,10 @@ export default async function LibraryHome() {
             ))}
           </ol>
 
-          <div className="mt-10 grid gap-10 lg:grid-cols-2">
-            <div>
-              {PRICE_QS.map((q) => (
-                <details key={q} className="group border-b border-ink/15">
-                  <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-6 py-3 text-[1.0625rem] font-[600] [&::-webkit-details-marker]:hidden">
-                    {q}
-                    <Icon name="plus" className="size-4 shrink-0 text-ink-2 transition-transform duration-200 group-open:rotate-45" />
-                  </summary>
-                  <p className="pb-5 pr-10 text-small text-ink-2">{faqs.find((f) => f.q === q)?.a}</p>
-                </details>
-              ))}
-            </div>
+          <div className="mt-10">
             {next.length > 0 && (
               <div>
-                <p className="text-[1rem] text-ink-2">More free packs are coming. Hear when yours is ready:</p>
+                <p className="text-[1rem] font-[600]">Free packs coming next</p>
                 <ul className="mt-4 flex flex-wrap gap-x-6 gap-y-4">
                   {next.map((p) => (
                     <li key={p.id} className="flex items-center gap-3">
@@ -215,18 +192,10 @@ export default async function LibraryHome() {
             )}
           </div>
           <p className="mt-10 text-small text-ink-2">
-            Prices in CAD, no HST charged. Running a whole company?{" "}
+            Prices in CAD, no HST charged.{" "}
             <Link href="/companies" className="tlink chev">
               Roger for companies
             </Link>
-            {siteConfig.contactEmail && (
-              <>
-                {" "}· Anything else:{" "}
-                <a href={`mailto:${siteConfig.contactEmail}`} className="tlink">
-                  {siteConfig.contactEmail}
-                </a>
-              </>
-            )}
           </p>
         </div>
       </section>

@@ -18,44 +18,32 @@ export function Journey({ entry, agent }: { entry: UseCase; agent: Agent }) {
   })();
   const where = /(^|\.)(x|twitter)\.com$/.test(host) ? "X" : host === "news.ycombinator.com" ? "Hacker News" : host;
   return (
-    <ol className="grid grid-cols-[minmax(0,1fr)] items-stretch gap-y-10 lg:grid-cols-[minmax(0,1fr)_3rem_minmax(0,1fr)_3rem_minmax(0,1fr)]">
+    <ol className="grid grid-cols-[minmax(0,1fr)] items-stretch gap-y-8 lg:grid-cols-[minmax(0,1fr)_3rem_minmax(0,1fr)_3rem_minmax(0,1fr)]">
       <Stage n={1} title="Someone posts it">
-        <div className="flex items-center gap-3">
+        <a href={entry.url} target="_blank" rel="noopener noreferrer nofollow" className="group flex items-center gap-3" aria-label={`${entry.handle}’s original post${where ? ` on ${where}` : ""}`}>
           <span className="grid size-9 place-items-center rounded-full bg-night text-[0.9375rem] font-[700] text-night-ink">{initial}</span>
-          <span>
-            <span className="block text-[0.9375rem] font-[600]">{entry.handle}</span>
-            <span className="block text-[0.8125rem] text-ink-2">public post{where ? ` · ${where}` : ""}</span>
-          </span>
-        </div>
-        <span className="mt-4 grid gap-2" aria-hidden="true">
-          <span className="h-2.5 w-full rounded-full bg-ink/10" />
-          <span className="h-2.5 w-[92%] rounded-full bg-ink/10" />
-          <span className="h-2.5 w-[64%] rounded-full bg-ink/10" />
-        </span>
-        <a href={entry.url} target="_blank" rel="noopener noreferrer nofollow" className="mt-auto inline-flex min-h-10 items-center gap-1.5 pt-4 text-[0.875rem] font-[600] text-accent hover:underline hover:underline-offset-4">
-          Read it where it was posted <Icon name="external" className="size-3.5" />
+          <span className="text-[0.9375rem] font-[600] group-hover:text-accent">{entry.handle}</span>
+          <Icon name="external" className="ml-auto size-4 text-ink-2 group-hover:text-accent" />
         </a>
+        <span className="mt-5 grid gap-2" aria-hidden="true">
+          <span className="h-2.5 w-full rounded-full bg-ink/10" />
+          <span className="h-2.5 w-[88%] rounded-full bg-ink/10" />
+          <span className="h-2.5 w-[60%] rounded-full bg-ink/10" />
+        </span>
       </Stage>
 
       <Arrow />
 
       <Stage n={2} title="We file it">
-        <p className="mono text-[0.6875rem] uppercase tracking-[0.08em] text-accent">{categoryLabel(entry.category)} · {entry.tool}</p>
-        <p className="mt-2 text-[1.25rem] font-[650] leading-snug tracking-[-0.02em]">{entry.title}</p>
-        <p className="mt-2 text-[0.9375rem] leading-relaxed text-ink-2">{entry.summary}</p>
-        <p className="mt-auto flex items-center gap-1.5 pt-4 text-[0.8125rem] text-ink-2">
-          <Icon name="pen" className="size-3.5" /> In our words, linked to the post
-        </p>
+        <p className="mono text-[0.6875rem] uppercase tracking-[0.08em] text-accent">{categoryLabel(entry.category)}</p>
+        <p className="mt-2 text-[1.375rem] font-[650] leading-snug tracking-[-0.02em]">{entry.title}</p>
       </Stage>
 
       <Arrow />
 
       <Stage n={3} title="You run it">
-        <p className="text-[0.8125rem] text-ink-2">Your agent · Muse, Grok Bot, Hark or any</p>
-        <p className="mono mt-2 rounded-[6px] border border-ink/15 bg-ground p-3 text-[0.8125rem] leading-relaxed">“{agent.prompt}”</p>
-        <p className="mt-auto flex items-center gap-1.5 pt-4 text-[0.8125rem] font-[600]">
-          <Icon name="shield" className="size-3.5 text-accent" /> {agent.name}, from the free pack, running on your own accounts.
-        </p>
+        <p className="mono text-[0.6875rem] uppercase tracking-[0.08em] text-accent">{agent.name}</p>
+        <p className="mono mt-2 rounded-[6px] border border-ink/15 bg-ground p-3 text-[0.8125rem] leading-relaxed">“{firstSentence(agent.prompt)}”</p>
       </Stage>
     </ol>
   );
@@ -71,6 +59,12 @@ function Stage({ n, title, children }: { n: number; title: string; children: Rea
       <div className="mt-4 flex flex-1 flex-col rounded-[8px] bg-surface p-5 text-ink shadow-[0_24px_48px_-28px_rgb(0_0_0/0.55)]">{children}</div>
     </li>
   );
+}
+
+/** The instruction's opening clause, so the card shows the idea without the whole prompt. */
+function firstSentence(text: string) {
+  const cut = [text.indexOf(": "), text.indexOf(". ")].filter((n) => n > 0);
+  return cut.length ? `${text.slice(0, Math.min(...cut))} …` : text;
 }
 
 /** The join between two stages: across on wide screens, down on narrow ones. */

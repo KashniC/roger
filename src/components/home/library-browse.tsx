@@ -13,12 +13,6 @@ type Shelf = { id: string; label: string; n: number; items: Entry[] };
 
 const FIRST = 5;
 
-const OPEN_IN_PACK = 3;
-
-/** The free pack's agents filed on the same shelf as this entry (the pack's own shelf tags). */
-function relatedAgents(u: Entry) {
-  return livePack.agents.filter((a) => a.categories.includes(u.category)).slice(0, 3);
-}
 
 /**
  * The library on the home page: pick a shelf and see its newest five, open a
@@ -124,7 +118,6 @@ export function LibraryBrowse({ shelves, total, heading }: { shelves: Shelf[]; t
           <ol key={searching ? `q:${query}` : `${shelf.id}:${more}`} className="fade-in">
             {list.map((u, i) => {
               const open = (picked ?? list[0]?.id) === u.id;
-              const related = relatedAgents(u);
               return (
                 <li key={u.id} className="border-b border-white/10">
                   <button
@@ -139,40 +132,16 @@ export function LibraryBrowse({ shelves, total, heading }: { shelves: Shelf[]; t
                     <Icon name="plus" className={`col-start-2 row-start-1 size-4 self-center text-night-ink-2 transition-transform duration-200 sm:col-start-auto sm:row-start-auto ${open ? "rotate-45 text-accent-night" : ""}`} />
                   </button>
                   {open && (
-                    <div id={`${id}-p-${i}`} className="fade-in grid gap-px overflow-hidden rounded-[8px] bg-white/10 mb-5 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
-                      <div className="bg-night-2 p-5">
-                        <p className="mono text-[0.6875rem] uppercase tracking-[0.08em] text-night-ink-2">What happened</p>
-                        <p className="mt-2 text-[1rem] leading-relaxed">{u.summary}</p>
-                        <a href={u.url} target="_blank" rel="noopener noreferrer nofollow" className="mt-4 inline-flex min-h-10 items-center gap-2 text-[0.9375rem] font-[600] text-accent-night hover:underline hover:underline-offset-4">
-                          Original post by {u.handle} <ExternalIcon className="size-3" />
+                    <div id={`${id}-p-${i}`} className="fade-in mb-5 rounded-[8px] bg-night-2 p-5 sm:p-6">
+                      <p className="max-w-[40rem] text-[1.0625rem] leading-relaxed">{u.summary}</p>
+                      <p className="mt-4 flex flex-wrap gap-x-6 gap-y-1 text-[0.9375rem]">
+                        <a href={u.url} target="_blank" rel="noopener noreferrer nofollow" className="inline-flex min-h-10 items-center gap-1.5 font-[600] text-night-ink hover:text-accent-night">
+                          Original post <ExternalIcon className="size-3" />
                         </a>
-                      </div>
-                      <div className="bg-night-2 p-5">
-                        <p className="mono text-[0.6875rem] uppercase tracking-[0.08em] text-night-ink-2">Get something like it running</p>
-                        {related.length > 0 && (
-                          <>
-                            <p className="mt-2 text-[0.9375rem] text-night-ink-2">On this shelf in the free pack:</p>
-                            <ul className="mt-2 grid gap-1.5">
-                              {related.map((a) => (
-                                <li key={a.id} className="flex items-baseline justify-between gap-3 border-b border-white/10 pb-1.5 text-[1rem] font-[560]">
-                                  {a.name}
-                                  <span className="mono text-[0.6875rem] uppercase tracking-[0.06em] text-night-ink-2">{livePack.agents.indexOf(a) < OPEN_IN_PACK ? "Open now" : "With email"}</span>
-                                </li>
-                              ))}
-                            </ul>
-                          </>
-                        )}
-                        <p className="mt-4 flex flex-wrap gap-x-5 gap-y-1 text-[0.9375rem]">
-                          {related.length > 0 && (
-                            <Link href={`/packs/${livePack.id}`} className="tlink chev inline-block py-1">
-                              Get the free pack
-                            </Link>
-                          )}
-                          <Link href="/setup" className="tlink chev inline-block py-1">
-                            Have Peter set this one up
-                          </Link>
-                        </p>
-                      </div>
+                        <Link href={`/packs/${livePack.id}`} className="tlink chev inline-flex min-h-10 items-center">
+                          Get the free pack
+                        </Link>
+                      </p>
                     </div>
                   )}
                 </li>
