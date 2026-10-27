@@ -59,7 +59,7 @@ export function LibraryBrowse({ shelves, total, heading }: { shelves: Shelf[]; t
           <label htmlFor={`${id}-q`} className="sr-only">
             Search all {total.toLocaleString("en-CA")} use cases
           </label>
-          <Icon name="search" className="pointer-events-none absolute left-4 top-1/2 size-[18px] -translate-y-1/2 text-ink-2" />
+          <Icon name="search" className="pointer-events-none absolute left-4 top-1/2 size-[18px] -translate-y-1/2 text-night-ink-2" />
           <input
             id={`${id}-q`}
             name="q"
@@ -68,7 +68,7 @@ export function LibraryBrowse({ shelves, total, heading }: { shelves: Shelf[]; t
             maxLength={120}
             autoComplete="off"
             placeholder="Search, e.g. invoices"
-            className="h-12 w-full rounded-[10px] border border-rule-strong bg-ground pl-11 pr-4 text-[1rem] outline-none transition-colors placeholder:text-ink-2/80 focus:border-ink"
+            className="h-12 w-full rounded-[6px] border border-white/20 bg-night-2 pl-11 pr-4 text-[1rem] text-night-ink outline-none transition-colors placeholder:text-night-ink-2 focus:border-accent-night"
           />
         </form>
       </div>
@@ -89,7 +89,7 @@ export function LibraryBrowse({ shelves, total, heading }: { shelves: Shelf[]; t
                 setQ("");
               }}
               className={`min-h-11 shrink-0 border-b-2 text-[0.9375rem] font-[560] transition-colors duration-150 ${
-                on ? "border-accent text-ink" : "border-transparent text-ink-2 hover:text-ink"
+                on ? "border-accent-night text-night-ink" : "border-transparent text-night-ink-2 hover:text-night-ink"
               }`}
             >
               {s.label}
@@ -98,9 +98,9 @@ export function LibraryBrowse({ shelves, total, heading }: { shelves: Shelf[]; t
         })}
       </div>
 
-      <div id={`${id}-list`} role="tabpanel" aria-live="polite" className="border-t border-rule">
+      <div id={`${id}-list`} role="tabpanel" aria-live="polite" className="border-t border-white/15">
         {searching && !current ? (
-          <p className="py-6 text-ink-2">Searching…</p>
+          <p className="py-6 text-night-ink-2">Searching…</p>
         ) : list.length === 0 ? (
           <p className="py-8 text-[1.125rem]">
             Nobody’s agent does that yet.{" "}
@@ -116,11 +116,11 @@ export function LibraryBrowse({ shelves, total, heading }: { shelves: Shelf[]; t
                   href={u.url}
                   target="_blank"
                   rel="noopener noreferrer nofollow"
-                  className="group grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-6 gap-y-1 border-b border-rule py-4 sm:grid-cols-[minmax(0,1fr)_9rem_auto] sm:py-5"
+                  className="group grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-6 gap-y-1 border-b border-white/10 py-4 sm:grid-cols-[minmax(0,1fr)_9rem_auto] sm:py-5"
                 >
-                  <span className="text-[clamp(1.125rem,1.8vw,1.375rem)] font-[600] leading-snug tracking-[-0.02em] transition-colors duration-150 group-hover:text-accent">{u.title}</span>
-                  <span className="col-start-1 text-[0.875rem] text-ink-2 sm:col-start-auto">{u.tool || "Any agent"}</span>
-                  <ExternalIcon className="col-start-2 row-start-1 size-3.5 self-center text-ink-2 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-accent sm:col-start-auto sm:row-start-auto" />
+                  <span className="text-[clamp(1.125rem,1.8vw,1.375rem)] font-[600] leading-snug tracking-[-0.02em] transition-colors duration-150 group-hover:text-accent-night">{u.title}</span>
+                  <span className="mono col-start-1 text-[0.8125rem] text-night-ink-2 sm:col-start-auto">{u.tool || "Any agent"}</span>
+                  <ExternalIcon className="col-start-2 row-start-1 size-3.5 self-center text-night-ink-2 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-accent-night sm:col-start-auto sm:row-start-auto" />
                 </a>
               </li>
             ))}
@@ -132,7 +132,7 @@ export function LibraryBrowse({ shelves, total, heading }: { shelves: Shelf[]; t
         {searching ? (
           current && current.total > 0 && (
             <Link href={`/library?q=${encodeURIComponent(query)}`} className="tlink chev py-2 text-[1rem]">
-              All {current.total.toLocaleString("en-CA")} matches
+              {current.total === 1 ? "Open it in the library" : `All ${current.total.toLocaleString("en-CA")} matches`}
             </Link>
           )
         ) : (
