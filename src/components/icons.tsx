@@ -86,6 +86,29 @@ const paths = {
   arrow: <path d="M5 12h14M13 6l6 6-6 6" />,
   bolt: <path d="M13 3 5 13.5h6L10 21l8-10.5h-6z" />,
   plus: <path d="M12 5v14M5 12h14" />,
+  home: <path d="M4 11 12 4l8 7M6 9.5V20h12V9.5M10 20v-5h4v5" />,
+  heart: <path d="M12 19.5s-7.5-4.4-7.5-10A4.2 4.2 0 0 1 12 7a4.2 4.2 0 0 1 7.5 2.5c0 5.6-7.5 10-7.5 10z" />,
+  book: <path d="M5 5.5A2.5 2.5 0 0 1 7.5 3H19v15H7.5A2.5 2.5 0 0 0 5 20.5zM5 20.5A2.5 2.5 0 0 0 7.5 23" />,
+  cart: (
+    <>
+      <path d="M3 4h2.5l2 11h10.5l2-8H6.5" />
+      <circle cx="9.5" cy="19.5" r="1.5" />
+      <circle cx="17" cy="19.5" r="1.5" />
+    </>
+  ),
+  users: (
+    <>
+      <circle cx="9" cy="8.5" r="3" />
+      <path d="M3.5 19c.8-3 3-4.5 5.5-4.5s4.7 1.5 5.5 4.5M15.5 5.8a3 3 0 0 1 0 5.4M17 14.6c1.8.4 3 1.8 3.5 4.4" />
+    </>
+  ),
+  briefcase: (
+    <>
+      <rect x="3.5" y="7" width="17" height="12.5" rx="2" />
+      <path d="M9 7V5h6v2M3.5 12.5h17" />
+    </>
+  ),
+  plane: <path d="M21 4 3 11l6.5 2.5L12 20l3-6 6-10zM9.5 13.5 21 4" />,
 };
 
 export type IconName = keyof typeof paths;
@@ -97,6 +120,27 @@ export function Icon({ name, className = "size-5", strokeWidth = 1.6 }: { name: 
     </svg>
   );
 }
+
+/** One icon per library shelf. */
+export const shelfIcon: Record<string, IconName> = {
+  "chief-of-staff": "briefcase",
+  money: "card",
+  marketing: "chat",
+  solo: "user",
+  customers: "users",
+  bookkeeping: "receipt",
+  travel: "plane",
+  household: "home",
+  errands: "cart",
+  kids: "star",
+  caregiving: "heart",
+  health: "heart",
+  learning: "book",
+  homework: "book",
+  staff: "users",
+  "shop-ops": "cart",
+  teams: "users",
+};
 
 /** The accounts the pack's agents connect to, each with its icon. */
 export function connectIcon(label: string): IconName {

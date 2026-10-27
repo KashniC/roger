@@ -8,13 +8,13 @@
  */
 @theme static {
   /* Ground and ink */
-  --color-ground: #fbfbfd; /* page: morning light on a white wall */
-  --color-ground-2: #f3f3f5; /* alternate chapter */
-  --color-surface: #ffffff; /* things that float or are objects */
-  --color-ink: #1d1d1f;
-  --color-ink-2: #5d5d63; /* 5.9:1 on ground-2 */
-  --color-rule: #e2e2e6;
-  --color-rule-strong: #c7c7cd;
+  --color-ground: #f7f5f1; /* page: warm paper */
+  --color-ground-2: #eeeae3; /* alternate chapter */
+  --color-surface: #fffdfa; /* things that float or are objects */
+  --color-ink: #1b1a18;
+  --color-ink-2: #5f5a53; /* 5.8:1 on ground-2 */
+  --color-rule: #e2ddd4;
+  --color-rule-strong: #c9c2b6;
 
   /* The one accent: Roger copper, from the toque mark */
   --color-accent: #9a5226; /* 6.1:1 on ground, white on it 6.3:1 */
@@ -23,11 +23,11 @@
   --color-accent-wash: #f6ece4;
 
   /* Night chapters */
-  --color-night: #0c0c0e;
-  --color-night-2: #19191c;
-  --color-night-ink: #f5f5f7;
-  --color-night-ink-2: #a3a3aa; /* 7.6:1 on night */
-  --color-night-rule: #2c2c31;
+  --color-night: #0f0e0d;
+  --color-night-2: #1a1917;
+  --color-night-ink: #f6f3ee;
+  --color-night-ink-2: #a9a39a; /* 7.7:1 on night */
+  --color-night-rule: #2e2b28;
   --color-accent-night: #e8a97f; /* copper lifted for dark grounds, 9.6:1 */
 
   /* Status, only where state lives */
@@ -505,7 +505,7 @@ h2 {
  * one purposeful gradient: the dawn the library is read at.
  */
 @theme static {
-  --color-night-3: #232327;
+  --color-night-3: #25231f;
   --color-ok: #2e7d4f;
   --color-ok-night: #86d6a6;
   --color-wait-night: #f3c47e;
@@ -721,5 +721,149 @@ h2 {
 @keyframes progress {
   from {
     transform: scaleX(0);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Round two: editorial scale. A wide display cut of Mona Sans for the big
+ * moments, a fine grid for the product stages, and the motion that ties them.
+ */
+.display {
+  font-weight: 680;
+  font-stretch: 112%;
+  letter-spacing: -0.055em;
+  line-height: 0.9;
+}
+.display-xl {
+  font-size: clamp(3.1rem, 9.2vw, 8.75rem);
+}
+.display-l {
+  font-size: clamp(2.6rem, 6.4vw, 6rem);
+}
+.display-m {
+  font-size: clamp(2.2rem, 4.6vw, 4.25rem);
+  line-height: 0.95;
+}
+.kicker {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+/* A fine technical grid that fades toward the edges */
+.stage-grid {
+  background-image:
+    linear-gradient(rgb(255 255 255 / 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(255 255 255 / 0.045) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(70% 60% at 50% 45%, #000 30%, transparent 80%);
+}
+.paper-grid {
+  background-image:
+    linear-gradient(rgb(27 26 24 / 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(27 26 24 / 0.05) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(70% 70% at 50% 50%, #000 20%, transparent 80%);
+}
+.glow-copper {
+  background: radial-gradient(50% 50% at 50% 50%, rgb(232 169 127 / 0.22), rgb(154 82 38 / 0.08) 50%, transparent 72%);
+}
+/* App chrome inside the illustrated windows */
+.chrome-dots {
+  display: flex;
+  gap: 6px;
+}
+.chrome-dots span {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 0.12);
+}
+/* Packets travelling along a connector */
+@media (prefers-reduced-motion: no-preference) {
+  .packet {
+    offset-rotate: 0deg;
+    animation: packet var(--packet-dur, 3.6s) var(--ease-soft) infinite;
+    animation-delay: var(--packet-delay, 0s);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .packet,
+  .packet-svg {
+    display: none;
+  }
+}
+@keyframes packet {
+  0% {
+    offset-distance: 0%;
+    opacity: 0;
+  }
+  12% {
+    opacity: 1;
+  }
+  88% {
+    opacity: 1;
+  }
+  100% {
+    offset-distance: 100%;
+    opacity: 0;
+  }
+}
+/* Slow status breathing for "running" indicators */
+@media (prefers-reduced-motion: no-preference) {
+  .breathe {
+    animation: breathe 2.8s ease-in-out infinite;
+  }
+}
+@keyframes breathe {
+  50% {
+    opacity: 0.45;
+  }
+}
+/* Ticker rows of real titles, opposite directions */
+.ticker {
+  display: flex;
+  width: max-content;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .ticker {
+    animation: marquee var(--ticker-dur, 90s) linear infinite;
+  }
+  .ticker-rev {
+    animation-direction: reverse;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ticker-wrap {
+    overflow-x: auto;
+  }
+}
+/* The sticky story swaps its visual with a crossfade */
+.story-frame {
+  transition:
+    opacity 600ms var(--ease-out),
+    transform 800ms var(--ease-expo);
+}
+.story-frame[data-on="false"] {
+  opacity: 0;
+  transform: translateY(16px) scale(0.985);
+  pointer-events: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .story-frame {
+    transition: none;
+  }
+}
+/* Orbit diagram */
+@media (prefers-reduced-motion: no-preference) {
+  .orbit-spin {
+    animation: spin 120s linear infinite;
+    transform-origin: 50% 50%;
+    transform-box: fill-box;
+  }
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
   }
 }
