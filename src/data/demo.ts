@@ -11,7 +11,6 @@ export type DemoScenario = {
   reads: { icon: "mail" | "calendar" | "file" | "receipt" | "globe" | "star"; source: string; text: string }[];
   draft: { to: string; subject: string; body: string };
   rule: string;
-  trail: { time: string; text: string }[];
 };
 
 export const demoSteps = [
@@ -39,12 +38,6 @@ export const demoScenarios: DemoScenario[] = [
       body: "Hi Dana, yes, the 14th works. I’m free Thursday between 2 and 4 if you’d like to go over the arrangements, and I’ve attached our spring price list.",
     },
     rule: "Leaves every draft unsent for you to approve",
-    trail: [
-      { time: "6:30", text: "Ran: each morning" },
-      { time: "6:31", text: "Read email, calendar and files" },
-      { time: "6:32", text: "Drafted 3 replies, sent none" },
-      { time: "7:12", text: "You approved the reply to Dana" },
-    ],
   },
   {
     agentId: "leads",
@@ -64,12 +57,6 @@ export const demoScenarios: DemoScenario[] = [
       body: "Hi Sam, thanks for getting in touch. I’d be glad to talk it through. Would Tuesday at 10 am or Wednesday at 3 pm work for a quick call?",
     },
     rule: "Never sends without your approval",
-    trail: [
-      { time: "2:14", text: "Ran: new enquiry from Sam R." },
-      { time: "2:14", text: "Read the form, calendar and email" },
-      { time: "2:15", text: "Drafted a reply with two times" },
-      { time: "2:40", text: "You approved; a nudge is drafted if Sam is quiet for 3 days" },
-    ],
   },
   {
     agentId: "invoices",
@@ -85,12 +72,6 @@ export const demoScenarios: DemoScenario[] = [
       body: "Hi there, a gentle reminder that invoice 1042 was due two weeks ago. I’ve attached it again here. Just let me know if anything’s needed from my side.",
     },
     rule: "Stops the moment an invoice is paid",
-    trail: [
-      { time: "8:00", text: "Ran: every Monday" },
-      { time: "8:00", text: "Found 1 overdue, skipped 1 paid" },
-      { time: "8:01", text: "Drafted a reminder in your voice" },
-      { time: "9:05", text: "You approved the reminder for 1042" },
-    ],
   },
   {
     agentId: "reviews",
@@ -109,11 +90,5 @@ export const demoScenarios: DemoScenario[] = [
       body: "Thanks so much, Priya. We’re glad you enjoyed it, and sorry about the wait. If you’d like to tell us more, email us and we’ll make it right.",
     },
     rule: "Drafts the reply; you’re the one who posts it",
-    trail: [
-      { time: "11:02", text: "Ran: new review from Priya K." },
-      { time: "11:02", text: "Read the review and your email" },
-      { time: "11:03", text: "Drafted a reply naming what she said" },
-      { time: "12:20", text: "You approved and posted the reply" },
-    ],
   },
 ];

@@ -73,9 +73,6 @@ export function AgentDemo() {
     setStep(0);
   };
 
-  // the activity trail grows with the walkthrough: run, read, draft, (wait), approve
-  const trail = step >= 4 ? s.trail : s.trail.slice(0, Math.min(step + 1, 3));
-
   return (
     <div ref={ref}>
       <div className="window rounded-[20px] shadow-[0_0_0_1px_rgb(255_255_255/0.09),0_60px_120px_-40px_rgb(0_0_0/0.9)]">
@@ -104,7 +101,7 @@ export function AgentDemo() {
           </span>
         </div>
 
-        <div className="grid grid-cols-[minmax(0,1fr)] lg:grid-cols-[15rem_minmax(0,1fr)_19rem]">
+        <div className="grid grid-cols-[minmax(0,1fr)] lg:grid-cols-[15rem_minmax(0,1fr)]">
           {/* sidebar: the agents */}
           <div className="border-b border-white/[0.07] p-3 lg:border-b-0 lg:border-r lg:p-4">
             <p className="kicker hidden px-2 pb-3 pt-1 text-night-ink-2 lg:block">From the free pack</p>
@@ -138,7 +135,7 @@ export function AgentDemo() {
           </div>
 
           {/* main: rail and stage */}
-          <div className="min-w-0 border-b border-white/[0.07] lg:border-b-0">
+          <div className="min-w-0">
             <div className="px-4 pt-5 sm:px-7 sm:pt-7">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <h3 className="text-[clamp(1.5rem,2.6vw,2rem)] font-[650] tracking-[-0.035em]">{s.agent.name}</h3>
@@ -191,53 +188,15 @@ export function AgentDemo() {
             </div>
           </div>
 
-          {/* inspector */}
-          <aside className="grid content-start gap-6 p-5 lg:border-l lg:border-white/[0.07] lg:p-6" aria-label="Agent details">
-            <div>
-              <p className="kicker text-night-ink-2">Rule</p>
-              <p className="mt-2 flex items-start gap-2 text-[0.9375rem] font-[600]">
-                <Icon name="shield" className="mt-0.5 size-4 shrink-0 text-accent-night" />
-                {s.rule}
-              </p>
-            </div>
-            <div>
-              <p className="kicker text-night-ink-2">Activity</p>
-              <ol className="mt-3">
-                {trail.map((t, i) => {
-                  const last = step >= 4 && i === trail.length - 1;
-                  return (
-                    <li key={`${sc}-${i}`} className="swap-in grid grid-cols-[2.75rem_0.75rem_minmax(0,1fr)] gap-2">
-                      <span className="mono pt-px text-right text-[0.75rem] text-night-ink-2">{t.time}</span>
-                      <span className="relative flex justify-center" aria-hidden="true">
-                        <span className={`relative z-10 mt-[5px] size-2 rounded-full ${last ? "bg-ok-night" : "bg-white/30"}`} />
-                        <span className="absolute bottom-0 top-3 w-px bg-white/10" />
-                      </span>
-                      <span className={`pb-3.5 text-[0.8125rem] leading-snug ${last ? "font-[600] text-night-ink" : "text-night-ink-2"}`}>{t.text}</span>
-                    </li>
-                  );
-                })}
-                {step === 3 && (
-                  <li className="swap-in grid grid-cols-[2.75rem_0.75rem_minmax(0,1fr)] gap-2">
-                    <span className="mono text-right text-[0.75rem] text-wait-night">now</span>
-                    <span className="flex justify-center" aria-hidden="true"><span className="breathe mt-[5px] size-2 rounded-full bg-wait-night" /></span>
-                    <span className="text-[0.8125rem] font-[600] text-wait-night">Waiting for you</span>
-                  </li>
-                )}
-              </ol>
-            </div>
-            <details className="group rounded-[12px] bg-white/[0.03] ring-1 ring-white/[0.07]">
-              <summary className="flex cursor-pointer list-none items-center justify-between gap-2 px-4 py-3 text-[0.8125rem] font-[600] [&::-webkit-details-marker]:hidden">
-                The instruction you paste in
-                <Icon name="plus" className="size-3.5 transition-transform group-open:rotate-45" />
-              </summary>
-              <p className="px-4 pb-4 text-[0.8125rem] leading-relaxed text-night-ink-2">“{s.agent.prompt}”</p>
-            </details>
-          </aside>
+        </div>
+        <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-1 border-t border-white/[0.07] px-4 py-3 text-[0.8125rem] text-night-ink-2 sm:px-5">
+          <span className="flex items-center gap-2">
+            <Icon name="shield" className="size-4 shrink-0 text-accent-night" />
+            {s.rule}
+          </span>
+          <span>Made-up names and times; the agents are the free pack’s own.</span>
         </div>
       </div>
-      <p className="mt-4 text-[0.875rem] text-night-ink-2">
-        An illustration with made-up names and times. The agents and their instructions are the free pack’s own.
-      </p>
     </div>
   );
 }
