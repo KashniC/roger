@@ -25,10 +25,13 @@ export function LiveSearch({
   newest,
   total,
   shelves,
+  chips = true,
 }: {
   newest: Entry[];
   total: number;
   shelves: { id: string; label: string; n: number }[];
+  /** The shelf filters; off where the search is a showpiece, not a browser. */
+  chips?: boolean;
 }) {
   const id = useId();
   const [q, setQ] = useState("");
@@ -105,6 +108,7 @@ export function LiveSearch({
         </div>
       </form>
 
+      {chips && (
       <div
         role="group"
         aria-label="Shelves"
@@ -131,6 +135,7 @@ export function LiveSearch({
           );
         })}
       </div>
+      )}
 
       {shown.length > 0 ? (
         <ul aria-live="polite" className="min-h-[19.5rem] border-t border-white/[0.06] px-2 py-2">

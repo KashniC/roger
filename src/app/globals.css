@@ -594,105 +594,6 @@ h2 {
     text-transform: uppercase;
     white-space: nowrap;
   }
-  .live-dot {
-    position: relative;
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: var(--color-ok-night);
-    flex: none;
-  }
-  @media (prefers-reduced-motion: no-preference) {
-    .live-dot::after {
-      content: "";
-      position: absolute;
-      inset: -4px;
-      border-radius: 50%;
-      border: 1.5px solid var(--color-ok-night);
-      animation: ping 2.4s var(--ease-out) infinite;
-    }
-  }
-}
-
-@keyframes ping {
-  from {
-    transform: scale(0.4);
-    opacity: 0.9;
-  }
-  to {
-    transform: scale(1.5);
-    opacity: 0;
-  }
-}
-
-/* The hero's sunrise: a low copper glow on the horizon, nothing else */
-.hero-dawn {
-  position: absolute;
-  inset: auto 0 0;
-  height: 75%;
-  pointer-events: none;
-  background:
-    radial-gradient(55% 60% at 62% 100%, rgb(232 169 127 / 0.26), rgb(154 82 38 / 0.1) 45%, transparent 72%);
-}
-.hero-horizon {
-  position: absolute;
-  inset: auto 0 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgb(232 169 127 / 0.45) 50%, transparent);
-}
-
-/* A slow strip of names; static and wrapped when motion is reduced */
-.marquee {
-  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
-}
-.marquee-track {
-  display: flex;
-  width: max-content;
-}
-@media (prefers-reduced-motion: no-preference) {
-  .marquee-track {
-    animation: marquee 48s linear infinite;
-  }
-  .marquee:hover .marquee-track {
-    animation-play-state: paused;
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .marquee {
-    mask-image: none;
-  }
-  .marquee-track {
-    flex-wrap: wrap;
-    width: auto;
-  }
-  .marquee-track > [aria-hidden="true"] {
-    display: none;
-  }
-}
-@keyframes marquee {
-  to {
-    transform: translateX(-50%);
-  }
-}
-
-/* Diagram connectors: dashes that drift toward the library */
-.flow {
-  stroke-dasharray: 3 7;
-}
-@media (prefers-reduced-motion: no-preference) {
-  .flow {
-    animation: flow 1.6s linear infinite;
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .flow-dot {
-    display: none;
-  }
-}
-@keyframes flow {
-  to {
-    stroke-dashoffset: -20;
-  }
 }
 
 /* Demo panels swap in place */
@@ -734,9 +635,6 @@ h2 {
   letter-spacing: -0.055em;
   line-height: 0.9;
 }
-.display-xl {
-  font-size: clamp(3.1rem, 9.2vw, 8.75rem);
-}
 .display-l {
   font-size: clamp(2.6rem, 6.4vw, 6rem);
 }
@@ -758,13 +656,6 @@ h2 {
   background-size: 48px 48px;
   mask-image: radial-gradient(70% 60% at 50% 45%, #000 30%, transparent 80%);
 }
-.paper-grid {
-  background-image:
-    linear-gradient(rgb(27 26 24 / 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgb(27 26 24 / 0.05) 1px, transparent 1px);
-  background-size: 48px 48px;
-  mask-image: radial-gradient(70% 70% at 50% 50%, #000 20%, transparent 80%);
-}
 .glow-copper {
   background: radial-gradient(50% 50% at 50% 50%, rgb(232 169 127 / 0.22), rgb(154 82 38 / 0.08) 50%, transparent 72%);
 }
@@ -779,36 +670,6 @@ h2 {
   border-radius: 50%;
   background: rgb(255 255 255 / 0.12);
 }
-/* Packets travelling along a connector */
-@media (prefers-reduced-motion: no-preference) {
-  .packet {
-    offset-rotate: 0deg;
-    animation: packet var(--packet-dur, 3.6s) var(--ease-soft) infinite;
-    animation-delay: var(--packet-delay, 0s);
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .packet,
-  .packet-svg {
-    display: none;
-  }
-}
-@keyframes packet {
-  0% {
-    offset-distance: 0%;
-    opacity: 0;
-  }
-  12% {
-    opacity: 1;
-  }
-  88% {
-    opacity: 1;
-  }
-  100% {
-    offset-distance: 100%;
-    opacity: 0;
-  }
-}
 /* Slow status breathing for "running" indicators */
 @media (prefers-reduced-motion: no-preference) {
   .breathe {
@@ -820,50 +681,31 @@ h2 {
     opacity: 0.45;
   }
 }
-/* Ticker rows of real titles, opposite directions */
-.ticker {
-  display: flex;
-  width: max-content;
-}
-@media (prefers-reduced-motion: no-preference) {
-  .ticker {
-    animation: marquee var(--ticker-dur, 90s) linear infinite;
-  }
-  .ticker-rev {
-    animation-direction: reverse;
+
+/* The journey's pulse runs Discover → Choose → Set up, then starts over */
+@media (prefers-reduced-motion: no-preference) and (min-width: 768px) {
+  .journey-pulse {
+    animation: journey 4.8s var(--ease-soft) infinite;
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .ticker-wrap {
-    overflow-x: auto;
+  .journey-pulse {
+    display: none !important;
   }
 }
-/* The sticky story swaps its visual with a crossfade */
-.story-frame {
-  transition:
-    opacity 600ms var(--ease-out),
-    transform 800ms var(--ease-expo);
-}
-.story-frame[data-on="false"] {
-  opacity: 0;
-  transform: translateY(16px) scale(0.985);
-  pointer-events: none;
-}
-@media (prefers-reduced-motion: reduce) {
-  .story-frame {
-    transition: none;
+@keyframes journey {
+  0% {
+    left: 16.66%;
+    opacity: 0;
   }
-}
-/* Orbit diagram */
-@media (prefers-reduced-motion: no-preference) {
-  .orbit-spin {
-    animation: spin 120s linear infinite;
-    transform-origin: 50% 50%;
-    transform-box: fill-box;
+  10% {
+    opacity: 1;
   }
-}
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
+  90% {
+    opacity: 1;
+  }
+  100% {
+    left: 83.33%;
+    opacity: 0;
   }
 }
