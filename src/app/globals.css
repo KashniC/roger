@@ -494,6 +494,10 @@ h2 {
  */
 @theme static {
   --color-night-3: #25231f;
+  /* The second dark: deep forest, for the one section about how it works */
+  --color-forest: #1c2a23;
+  --color-forest-2: #24362d;
+  --color-forest-ink-2: #b4c2b8; /* 8.4:1 on forest */
   --color-ok: #2e7d4f;
   --color-ok-night: #86d6a6;
   --color-wait-night: #f3c47e;
@@ -586,4 +590,16 @@ h2 {
   font-size: 0.75rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
+}
+
+/* Library results settle in when the shelf or search changes: opacity only, short */
+@media (prefers-reduced-motion: no-preference) {
+  .fade-in {
+    animation: fade-in 180ms var(--ease-out);
+  }
+}
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
 }

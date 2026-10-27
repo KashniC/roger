@@ -109,7 +109,7 @@ export function LibraryBrowse({ shelves, total, heading }: { shelves: Shelf[]; t
             </Link>
           </p>
         ) : (
-          <ol>
+          <ol key={searching ? `q:${query}` : `${shelf.id}:${more}`} className="fade-in">
             {list.map((u) => (
               <li key={u.id}>
                 <a

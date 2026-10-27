@@ -61,18 +61,21 @@ const START_QS = ["Which agent do you set up?", "What does it cost after the set
 const guide: [string, string][] = [
   ["Runs", "Weekdays at 6:45am"],
   ["Reads", "Your email, calendar and task list"],
-  ["Sends you", "One screen: meetings, replies owed, what’s overdue, one thing first"],
   ["Never", "Replies, books or pays on its own"],
-  ["To change it", "Tell it in plain words: “skip Fridays”"],
 ];
 
 export default async function LibraryHome() {
   const [all, settings] = await Promise.all([getUseCases(), getSettings()]);
   const sorted = [...all].sort((a, b) => (b.addedAt ?? b.weekOf).localeCompare(a.addedAt ?? a.weekOf));
+
+  // One home per entry: the three stories, the one example in "how it works",
+  // then the library shelves, which leave out the four already shown.
   const stories = pickStories(sorted);
-  const storyIds = new Set(stories.map((s) => s.id));
-  // the three stories have their own section; the library doesn't repeat them
-  const shelves = byShelf(sorted.filter((u) => !storyIds.has(u.id)));
+  const brief = livePack.agents.find((a) => a.id === "brief")!;
+  const example = sorted.find((u) => u.tool && brief.categories.includes(u.category) && !stories.includes(u)) ?? null;
+  const shown = new Set([...stories, ...(example ? [example] : [])].map((u) => u.id));
+  const shelves = byShelf(sorted.filter((u) => !shown.has(u.id)));
+
   const total = all.length;
   const [free, setupPlan, monthly] = ladderFor(settings).rungs;
   const faqs = setupFaqs(settings.planPrice);
@@ -81,31 +84,40 @@ export default async function LibraryHome() {
   const next = packs.filter((p) => p.status === "soon");
   const dawnCredit = credits.torontoDawn;
   const offers = [
-    { ...free, body: `Ten agents for a business of one, with the instructions to paste in. ${OPEN_IN_PACK} open now, the rest with your email.`, primary: true },
-    { ...setupPlan, primary: false },
-    { ...monthly, primary: false },
+    { ...free, who: "You set it up", body: `Ten agents for a business of one, with the instructions to paste in. ${OPEN_IN_PACK} open now, the rest with your email.` },
+    { ...setupPlan, who: "Peter sets it up, with you" },
+    { ...monthly, who: "After a setup" },
   ];
 
   return (
     <>
-      {/* 1 · What Roger is, with the real library as the picture */}
-      <section id="library" aria-labelledby="hero-title" className="scroll-mt-16 bg-ground pb-24 pt-14 md:pb-32 md:pt-20">
-        <div className="wrap">
-          <div className="grid gap-8 lg:grid-cols-[minmax(0,7fr)_minmax(0,4.2fr)] lg:items-end lg:gap-12">
-            <h1 id="hero-title" className="display text-[clamp(3rem,6.4vw,5.75rem)]">
-              What people’s AI agents <span className="text-accent">actually do.</span>
+      {/* 1 · What Roger is: the headline on dark, the real library breaking out of it */}
+      <section aria-labelledby="hero-title" className="on-night bg-night text-night-ink">
+        <div className="wrap pb-[12rem] pt-14 md:pb-[14rem] md:pt-24">
+          <div className="grid gap-10 lg:grid-cols-[minmax(0,7fr)_minmax(0,4.4fr)] lg:items-end lg:gap-14">
+            <h1 id="hero-title" className="display text-[clamp(3rem,6.6vw,6rem)]">
+              What people’s AI agents <span className="text-accent-night">actually do.</span>
             </h1>
             <div className="lg:pb-2">
-              <p className="text-lead text-ink-2">
-                Real use cases from public posts, read every morning. Find one, then set it up yourself or have it done.
+              <p className="text-lead text-night-ink-2">
+                Real use cases from public posts, read every morning. Set one up yourself with a free pack, or have Peter set it up for you.
               </p>
-              <Link href={`/packs/${pack.id}`} className="btn btn-l mt-7">
-                Get the free 10-agent pack
-              </Link>
+              <div className="mt-8 flex flex-wrap items-center gap-3">
+                <Link href={`/packs/${pack.id}`} className="btn btn-l">
+                  Get the free 10-agent pack
+                </Link>
+                <Link href="/setup" className="btn btn-l btn-ghost">
+                  Book a custom setup
+                </Link>
+              </div>
             </div>
           </div>
+        </div>
+      </section>
 
-          <div className="mt-14 rounded-[18px] border border-rule bg-surface p-5 shadow-[0_24px_48px_-36px_rgb(27_26_24/0.35)] sm:p-8 md:mt-16">
+      <section id="library" aria-label="The library" className="flow-root scroll-mt-16 bg-ground pb-24 md:pb-32">
+        <div className="wrap">
+          <div className="-mt-[9.5rem] rounded-[18px] bg-surface p-5 text-ink shadow-[0_0_0_1px_rgb(27_26_24/0.06),0_40px_80px_-40px_rgb(0_0_0/0.55)] sm:p-8 md:-mt-[11rem]">
             <LibraryBrowse
               shelves={shelves}
               total={total}
@@ -120,11 +132,11 @@ export default async function LibraryHome() {
         </div>
       </section>
 
-      {/* 2 · Three results worth stopping for */}
-      <section aria-labelledby="stories-title" className="section bg-ground-2">
+      {/* 2 · Three results, large */}
+      <section aria-labelledby="stories-title" className="bg-ground pb-28 md:pb-36">
         <div className="wrap">
           <h2 id="stories-title" className="display display-m">
-            Three things agents did.
+            Three things <span className="text-accent">agents did.</span>
           </h2>
           <div className="mt-12">
             <Stories stories={stories} />
@@ -132,105 +144,122 @@ export default async function LibraryHome() {
         </div>
       </section>
 
-      {/* 3 · Trust and control, shown with the guide every setup ends with */}
-      <section aria-labelledby="trust-title" className="on-night section bg-night text-night-ink">
-        <div className="wrap grid gap-14 lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] lg:items-center lg:gap-20">
-          <div>
-            <h2 id="trust-title" className="display text-[clamp(2.4rem,4.4vw,4rem)] leading-[0.95]">
-              Your accounts. <span className="block text-accent-night">Your rules.</span>
-            </h2>
-            <ul className="mt-10 border-t border-white/15">
-              {principles.map((p) => (
-                <li key={p.title} className="border-b border-white/10">
-                  <details className="group">
-                    <summary className="flex min-h-16 cursor-pointer list-none items-center justify-between gap-4 py-4 text-[1.1875rem] font-[620] tracking-[-0.02em] [&::-webkit-details-marker]:hidden">
-                      {p.title}
-                      <Icon name="plus" className="size-4 shrink-0 text-night-ink-2 transition-transform duration-200 group-open:rotate-45" />
-                    </summary>
-                    <p className="pb-5 pr-8 text-small text-night-ink-2">{answer(p.q)}</p>
-                  </details>
-                </li>
-              ))}
-            </ul>
-          </div>
+      {/* 3 · How it works, with real pieces of the product; and the rules it runs by */}
+      <section aria-labelledby="how-title" className="bg-forest py-28 text-night-ink md:py-36">
+        <div className="wrap">
+          <h2 id="how-title" className="display display-m max-w-[16ch]">
+            From someone’s post <span className="text-accent-night">to your agent.</span>
+          </h2>
 
-          <figure>
-            <div className="rounded-[14px] bg-ground p-7 text-ink sm:p-10">
-              <p className="text-[0.875rem] text-ink-2">Your agents · page 1 of 6</p>
-              <p className="display mt-4 text-[clamp(2rem,3.4vw,2.75rem)]">Morning brief</p>
-              <dl className="mt-7 border-t border-rule">
+          <ol className="mt-16 grid gap-px overflow-hidden rounded-[18px] bg-white/10 lg:grid-cols-3">
+            <li className="flex flex-col bg-forest p-7 sm:p-8">
+              <Step n={1} title="Find it" line="Someone’s agent did it, and it’s in the library." />
+              {example && (
+                <a href={example.url} target="_blank" rel="noopener noreferrer nofollow" className="group mt-8 block rounded-[12px] bg-ground p-5 text-ink transition-transform duration-200 hover:-translate-y-0.5">
+                  <span className="text-[0.8125rem] text-ink-2">{example.tool}</span>
+                  <span className="mt-1 block text-[1.125rem] font-[620] leading-snug tracking-[-0.02em]">{example.title}</span>
+                  <span className="mt-3 flex items-center gap-1.5 text-[0.875rem] text-ink-2 group-hover:text-accent">
+                    {example.handle} <Icon name="external" className="size-3.5" />
+                  </span>
+                </a>
+              )}
+            </li>
+            <li className="flex flex-col bg-forest p-7 sm:p-8">
+              <Step n={2} title="Take the instruction" line={`Each agent in the free pack comes ready to paste in. This is ${brief.name.toLowerCase()}.`} />
+              <blockquote className="mono mt-8 rounded-[12px] bg-forest-2 p-5 text-[0.875rem] leading-relaxed text-night-ink">“{brief.prompt}”</blockquote>
+            </li>
+            <li className="flex flex-col bg-forest p-7 sm:p-8">
+              <Step n={3} title="Set it up" line="Yourself, or with Peter. A setup ends with a guide to every agent." />
+              <dl className="mt-8 rounded-[12px] bg-ground p-5 text-[0.9375rem] text-ink">
+                <p className="text-[0.8125rem] text-ink-2">Your agents · {brief.name}</p>
                 {guide.map(([k, v]) => (
-                  <div key={k} className="grid grid-cols-[6.5rem_minmax(0,1fr)] gap-4 border-b border-rule py-3.5 text-[1rem] sm:grid-cols-[8.5rem_minmax(0,1fr)]">
+                  <div key={k} className="mt-3 grid grid-cols-[4.5rem_minmax(0,1fr)] gap-3 border-t border-rule pt-3">
                     <dt className="text-ink-2">{k}</dt>
                     <dd className={k === "Never" ? "font-[650] text-accent" : ""}>{v}</dd>
                   </div>
                 ))}
               </dl>
-            </div>
-            <figcaption className="mt-4 text-[0.9375rem] text-night-ink-2">
-              A page from the guide you keep after a{" "}
-              <Link href="/setup" className="tlink">
-                custom setup
-              </Link>
-              .
-            </figcaption>
-          </figure>
+            </li>
+          </ol>
+
+          <div className="mt-20 grid gap-8 lg:grid-cols-[minmax(0,4fr)_minmax(0,8fr)] lg:gap-14">
+            <h3 className="display text-[clamp(1.875rem,3vw,2.5rem)] leading-[0.95]">
+              Your accounts. <span className="block text-accent-night">Your rules.</span>
+            </h3>
+            <ul className="border-t border-white/15">
+              {principles.map((p) => (
+                <li key={p.title} className="border-b border-white/10">
+                  <details className="group">
+                    <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-4 py-3 text-[1.125rem] font-[600] tracking-[-0.015em] [&::-webkit-details-marker]:hidden">
+                      {p.title}
+                      <Icon name="plus" className="size-4 shrink-0 text-forest-ink-2 transition-transform duration-200 group-open:rotate-45" />
+                    </summary>
+                    <p className="pb-5 pr-8 text-small text-forest-ink-2">{answer(p.q)}</p>
+                  </details>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       </section>
 
-      {/* 4 · Three ways to start */}
-      <section id="pricing" aria-labelledby="start-title" className="section scroll-mt-16 bg-ground">
+      {/* 4 · Three ways to start, side by side */}
+      <section id="pricing" aria-labelledby="start-title" className="scroll-mt-16 bg-ground py-28 md:py-36">
         <div className="wrap">
           <h2 id="start-title" className="display display-m">
-            Do it yourself, <span className="block text-ink/40">or have it done.</span>
+            Do it yourself, <span className="text-accent">or have it done.</span>
           </h2>
-          <ol className="mt-12 grid border-t border-ink lg:grid-cols-3">
-            {offers.map((p, i) => (
-              <li key={p.name} className={`flex flex-col border-b border-rule py-8 lg:border-b-0 lg:py-10 ${i > 0 ? "lg:border-l lg:pl-8" : ""} ${i < 2 ? "lg:pr-8" : ""}`}>
-                <p className="text-[1.125rem] font-[620]">{p.name}</p>
-                <p className="mt-4 flex items-baseline gap-2">
-                  <span className="display text-[clamp(3.25rem,5vw,4.5rem)] tabular-nums">{p.price}</span>
-                  {p.per && <span className="text-ink-2">{p.per}</span>}
-                </p>
-                <p className="mt-4 max-w-[24rem] text-[1rem] text-ink-2">{p.body}</p>
-                <details className="group mt-5">
-                  <summary className="tlink-quiet flex min-h-11 cursor-pointer list-none items-center gap-2 text-[0.9375rem] [&::-webkit-details-marker]:hidden">
-                    What’s included
-                    <Icon name="plus" className="size-3.5 transition-transform duration-200 group-open:rotate-45" />
-                  </summary>
-                  <ul className="mt-1 grid gap-2 text-[0.9375rem]">
-                    {p.includes.map((x) => (
-                      <li key={x} className="grid grid-cols-[1.25rem_minmax(0,1fr)] gap-2.5">
-                        <Icon name="check" className="mt-0.5 size-4 text-accent" strokeWidth={2} />
-                        {x}
-                      </li>
-                    ))}
-                  </ul>
-                </details>
-                <div className="mt-auto pt-8">
-                  <Link href={p.href} className={`btn btn-m ${p.primary ? "" : "btn-ghost"}`}>
-                    {p.cta}
-                  </Link>
-                </div>
-              </li>
-            ))}
+          <ol className="mt-12 grid gap-3 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)_minmax(0,1fr)]">
+            {offers.map((p, i) => {
+              const dark = i === 0;
+              return (
+                <li key={p.name} className={`flex flex-col rounded-[18px] p-7 sm:p-8 ${dark ? "on-night bg-night text-night-ink" : "bg-surface shadow-[0_0_0_1px_rgb(27_26_24/0.08)]"}`}>
+                  <p className={`text-[0.9375rem] ${dark ? "text-accent-night" : "text-accent"}`}>{p.who}</p>
+                  <p className="mt-2 text-[1.25rem] font-[640] tracking-[-0.02em]">{p.name}</p>
+                  <p className="mt-6 flex items-baseline gap-2">
+                    <span className="display text-[clamp(3.25rem,5vw,4.5rem)] tabular-nums">{p.price}</span>
+                    {p.per && <span className={dark ? "text-night-ink-2" : "text-ink-2"}>{p.per}</span>}
+                  </p>
+                  <p className={`mt-4 text-[1rem] ${dark ? "text-night-ink-2" : "text-ink-2"}`}>{p.body}</p>
+                  <details className="group mt-5">
+                    <summary className={`flex min-h-11 cursor-pointer list-none items-center gap-2 text-[0.9375rem] font-[560] [&::-webkit-details-marker]:hidden ${dark ? "text-night-ink-2 hover:text-night-ink" : "text-ink-2 hover:text-ink"}`}>
+                      What’s included
+                      <Icon name="plus" className="size-3.5 transition-transform duration-200 group-open:rotate-45" />
+                    </summary>
+                    <ul className="mt-1 grid gap-2 text-[0.9375rem]">
+                      {p.includes.map((x) => (
+                        <li key={x} className="grid grid-cols-[1.25rem_minmax(0,1fr)] gap-2.5">
+                          <Icon name="check" className={`mt-0.5 size-4 ${dark ? "text-accent-night" : "text-accent"}`} strokeWidth={2} />
+                          {x}
+                        </li>
+                      ))}
+                    </ul>
+                  </details>
+                  <div className="mt-auto pt-8">
+                    <Link href={p.href} className={`btn btn-m ${dark ? "" : i === 1 ? "btn-ink" : "btn-ghost"}`}>
+                      {p.cta}
+                    </Link>
+                  </div>
+                </li>
+              );
+            })}
           </ol>
 
           {next.length > 0 && (
-            <div className="mt-10 flex flex-col gap-5 rounded-[14px] bg-night p-6 text-night-ink sm:p-7">
-              <p className="text-[1rem]">More free packs are coming. Want to hear when yours is ready?</p>
+            <div className="mt-8 flex flex-col gap-4 border-y border-rule py-6">
+              <p className="text-[1rem] text-ink-2">More free packs are coming. Hear when yours is ready:</p>
               <ul className="flex flex-wrap gap-x-6 gap-y-4">
                 {next.map((p) => (
                   <li key={p.id} className="flex items-center gap-3">
                     <span className="font-[600]">{p.persona}</span>
-                    <Interest persona={p.id} />
+                    <Interest persona={p.id} tone="light" />
                   </li>
                 ))}
               </ul>
             </div>
           )}
 
-          <div className="mt-12 grid gap-x-10 border-t border-rule md:grid-cols-2">
+          <div className="mt-10 grid gap-x-10 md:grid-cols-2">
             {START_QS.map((q) => (
               <details key={q} className="group border-b border-rule">
                 <summary className="flex min-h-16 cursor-pointer list-none items-center justify-between gap-6 py-4 text-[1.0625rem] font-[600] [&::-webkit-details-marker]:hidden">
@@ -290,5 +319,17 @@ export default async function LibraryHome() {
         </p>
       </section>
     </>
+  );
+}
+
+function Step({ n, title, line }: { n: number; title: string; line: string }) {
+  return (
+    <div>
+      <p className="flex items-center gap-3">
+        <span className="grid size-8 place-items-center rounded-full bg-accent-night text-[0.875rem] font-[650] text-night">{n}</span>
+        <span className="text-[1.375rem] font-[640] tracking-[-0.025em]">{title}</span>
+      </p>
+      <p className="mt-3 text-[1rem] text-forest-ink-2">{line}</p>
+    </div>
   );
 }

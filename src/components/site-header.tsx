@@ -43,6 +43,8 @@ function navFor(path: string): NavSet {
 export function SiteHeader() {
   const path = usePathname() || "/";
   const nav = navFor(path);
+  // the home page opens on a dark hero, so its bar is dark too; no scroll work either way
+  const dark = path === "/";
   // The menu belongs to the page it was opened on, so navigating closes it.
   const [openOn, setOpenOn] = useState<string | null>(null);
   const open = openOn === path;
@@ -64,18 +66,18 @@ export function SiteHeader() {
   }, [open]);
 
   return (
-    <header className="sticky top-0 z-40 border-b border-rule bg-ground text-ink">
+    <header className={`sticky top-0 z-40 border-b ${dark ? "on-night border-white/10 bg-night text-night-ink" : "border-rule bg-ground text-ink"}`}>
       <a href="#main" className="sr-only-focusable absolute left-4 top-2 z-50 rounded-full bg-ink px-4 py-2 text-small text-ground">
         Skip to content
       </a>
       <div className="wrap flex h-[60px] items-center gap-6">
         <Link href="/" className="-ml-1 flex items-center gap-2 rounded-md px-1 py-1 text-[1.0625rem] font-[620] tracking-[-0.015em]">
-          <Toque className="size-[22px] text-accent" />
+          <Toque className={`size-[22px] ${dark ? "text-accent-night" : "text-accent"}`} />
           Roger
         </Link>
 
         <nav aria-label="Main" className="ml-auto hidden md:block">
-          <ul className="flex items-center gap-5 whitespace-nowrap text-[0.9375rem] text-ink-2 lg:gap-7">
+          <ul className={`flex items-center gap-5 whitespace-nowrap text-[0.9375rem] lg:gap-7 ${dark ? "text-night-ink-2" : "text-ink-2"}`}>
             {nav.links.map((l) => {
               const active = l.href === path;
               return (
@@ -83,7 +85,7 @@ export function SiteHeader() {
                   <Link
                     href={l.href}
                     aria-current={active ? "page" : undefined}
-                    className={`rounded px-0.5 py-1 transition-colors duration-150 hover:text-ink ${active ? "text-ink" : ""}`}
+                    className={`rounded px-0.5 py-1 transition-colors duration-150 ${dark ? "hover:text-night-ink" : "hover:text-ink"} ${active ? (dark ? "text-night-ink" : "text-ink") : ""}`}
                   >
                     {l.label}
                   </Link>
@@ -126,14 +128,14 @@ export function SiteHeader() {
       </div>
 
       {open && (
-        <div id="mobile-menu" ref={menuRef} className="border-t border-rule md:hidden">
+        <div id="mobile-menu" ref={menuRef} className={`border-t md:hidden ${dark ? "border-white/10" : "border-rule"}`}>
           <nav aria-label="Main" className="wrap pb-6 pt-2">
             <ul>
               {nav.links.map((l) => (
-                <li key={l.href} className="border-b border-rule">
+                <li key={l.href} className={`border-b ${dark ? "border-white/10" : "border-rule"}`}>
                   <Link href={l.href} className="flex min-h-14 items-center justify-between text-title" onClick={() => setOpen(false)}>
                     {l.label}
-                    <span aria-hidden="true" className="text-ink-2">›</span>
+                    <span aria-hidden="true" className={dark ? "text-night-ink-2" : "text-ink-2"}>›</span>
                   </Link>
                 </li>
               ))}

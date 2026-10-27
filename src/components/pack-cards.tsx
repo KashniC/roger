@@ -6,7 +6,9 @@ import { trackEvent } from "@/lib/session";
 
 const idle: ActionState = { status: "idle" };
 
-export function Interest({ persona }: { persona: string }) {
+/** "Tell me when" for a pack that isn't out yet. Dark by default; light for paper sections. */
+export function Interest({ persona, tone = "dark" }: { persona: string; tone?: "dark" | "light" }) {
+  const light = tone === "light";
   const id = useId();
   const [open, setOpen] = useState(false);
   const [state, action, pending] = useActionState(saveLead, idle);
@@ -19,7 +21,7 @@ export function Interest({ persona }: { persona: string }) {
           setOpen(true);
           trackEvent("persona_interest", { persona });
         }}
-        className="chip min-h-10 rounded-full border border-white/50 px-4 text-small font-[600] text-white transition-colors hover:bg-white/10"
+        className={`chip min-h-11 rounded-full border px-4 text-small font-[600] transition-colors ${light ? "border-ink/30 text-ink hover:bg-ink/5" : "border-white/50 text-white hover:bg-white/10"}`}
       >
         Tell me when
       </button>
@@ -29,13 +31,13 @@ export function Interest({ persona }: { persona: string }) {
       <label htmlFor={`${id}-e`} className="sr-only">
         Email
       </label>
-      <input id={`${id}-e`} name="email" type="email" required autoComplete="email" placeholder="you@example.com" className="h-10 rounded-full border border-white/40 bg-white/10 px-4 text-small text-white outline-none placeholder:text-white/60 focus:border-white" />
+      <input id={`${id}-e`} name="email" type="email" required autoComplete="email" placeholder="you@example.com" className={`h-11 rounded-full border px-4 text-small outline-none ${light ? "border-rule-strong bg-surface text-ink placeholder:text-ink-2 focus:border-ink" : "border-white/40 bg-white/10 text-white placeholder:text-white/60 focus:border-white"}`} />
       <input type="hidden" name="persona" value={persona} />
       <input type="hidden" name="kind" value="interest" />
-      <button type="submit" disabled={pending} className="min-h-10 rounded-full bg-white px-4 text-small font-[600] text-[#191816]">
+      <button type="submit" disabled={pending} className={`min-h-11 rounded-full px-4 text-small font-[600] ${light ? "bg-ink text-ground" : "bg-white text-[#191816]"}`}>
         {pending ? "Saving…" : "Tell me when it’s ready"}
       </button>
-      {state.status === "error" && <p className="text-meta text-white">{state.message}</p>}
+      {state.status === "error" && <p className={`text-meta ${light ? "text-error" : "text-white"}`}>{state.message}</p>}
     </form>
   );
 }
