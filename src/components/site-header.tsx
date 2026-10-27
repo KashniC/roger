@@ -40,45 +40,9 @@ function navFor(path: string): NavSet {
   return library;
 }
 
-/**
- * Dark sections are marked data-header-tone="night"; the header goes dark
- * while one of them is passing under it.
- */
-function useNightUnder(path: string) {
-  const [state, setState] = useState<{ path: string; night: boolean } | null>(null);
-  useEffect(() => {
-    const dark = [...document.querySelectorAll<HTMLElement>('[data-header-tone="night"]')];
-    if (!dark.length) return;
-    // dark whenever a dark section meets the header's bottom edge
-    let frame = 0;
-    const check = () => {
-      frame = 0;
-      const night = dark.some((el) => {
-        const r = el.getBoundingClientRect();
-        return r.top <= 64 && r.bottom > 64;
-      });
-      setState({ path, night });
-    };
-    const queue = () => {
-      if (!frame) frame = requestAnimationFrame(check);
-    };
-    queue();
-    window.addEventListener("scroll", queue, { passive: true });
-    window.addEventListener("resize", queue);
-    return () => {
-      cancelAnimationFrame(frame);
-      window.removeEventListener("scroll", queue);
-      window.removeEventListener("resize", queue);
-    };
-  }, [path]);
-  // before the first measurement, the home page starts under its dark hero
-  return state?.path === path ? state.night : path === "/";
-}
-
 export function SiteHeader() {
   const path = usePathname() || "/";
   const nav = navFor(path);
-  const dark = useNightUnder(path);
   // The menu belongs to the page it was opened on, so navigating closes it.
   const [openOn, setOpenOn] = useState<string | null>(null);
   const open = openOn === path;
@@ -100,22 +64,18 @@ export function SiteHeader() {
   }, [open]);
 
   return (
-    <header
-      className={`sticky top-0 z-40 border-b backdrop-blur-xl backdrop-saturate-150 transition-colors duration-300 ${
-        dark ? "on-night border-white/[0.07] bg-night/80 text-night-ink" : "border-rule/70 bg-ground/85 text-ink"
-      }`}
-    >
+    <header className="sticky top-0 z-40 border-b border-rule bg-ground text-ink">
       <a href="#main" className="sr-only-focusable absolute left-4 top-2 z-50 rounded-full bg-ink px-4 py-2 text-small text-ground">
         Skip to content
       </a>
       <div className="wrap flex h-[60px] items-center gap-6">
         <Link href="/" className="-ml-1 flex items-center gap-2 rounded-md px-1 py-1 text-[1.0625rem] font-[620] tracking-[-0.015em]">
-          <Toque className={`size-[22px] ${dark ? "text-accent-night" : "text-accent"}`} />
+          <Toque className="size-[22px] text-accent" />
           Roger
         </Link>
 
         <nav aria-label="Main" className="ml-auto hidden md:block">
-          <ul className={`flex items-center gap-5 whitespace-nowrap text-[0.9375rem] lg:gap-7 ${dark ? "text-night-ink-2" : "text-ink-2"}`}>
+          <ul className="flex items-center gap-5 whitespace-nowrap text-[0.9375rem] text-ink-2 lg:gap-7">
             {nav.links.map((l) => {
               const active = l.href === path;
               return (
@@ -123,7 +83,7 @@ export function SiteHeader() {
                   <Link
                     href={l.href}
                     aria-current={active ? "page" : undefined}
-                    className={`rounded px-0.5 py-1 transition-colors duration-[180ms] ${dark ? "hover:text-night-ink" : "hover:text-ink"} ${active ? (dark ? "text-night-ink" : "text-ink") : ""}`}
+                    className={`rounded px-0.5 py-1 transition-colors duration-150 hover:text-ink ${active ? "text-ink" : ""}`}
                   >
                     {l.label}
                   </Link>
@@ -166,14 +126,14 @@ export function SiteHeader() {
       </div>
 
       {open && (
-        <div id="mobile-menu" ref={menuRef} className={`border-t md:hidden ${dark ? "border-white/[0.07]" : "border-rule/70"}`}>
+        <div id="mobile-menu" ref={menuRef} className="border-t border-rule md:hidden">
           <nav aria-label="Main" className="wrap pb-6 pt-2">
             <ul>
               {nav.links.map((l) => (
-                <li key={l.href} className={`border-b ${dark ? "border-white/[0.07]" : "border-rule/70"}`}>
+                <li key={l.href} className="border-b border-rule">
                   <Link href={l.href} className="flex min-h-14 items-center justify-between text-title" onClick={() => setOpen(false)}>
                     {l.label}
-                    <span aria-hidden="true" className={dark ? "text-night-ink-2" : "text-ink-2"}>›</span>
+                    <span aria-hidden="true" className="text-ink-2">›</span>
                   </Link>
                 </li>
               ))}

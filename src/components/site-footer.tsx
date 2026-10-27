@@ -100,7 +100,7 @@ export async function SiteFooter() {
   const year = await currentYear();
   const { contactEmail } = siteConfig;
   return (
-    <footer data-header-tone="night" className="on-night bg-night text-night-ink">
+    <footer className="on-night bg-night text-night-ink">
       <div className="wrap grid gap-12 pb-10 pt-20 md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] md:pt-24">
         <div>
           <Link href="/" className="-ml-1 inline-flex items-center gap-2 rounded-md px-1 py-1 text-[1.25rem] font-[620] tracking-[-0.02em]">

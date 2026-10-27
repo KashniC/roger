@@ -487,18 +487,6 @@ h2 {
   opacity: 1 !important;
 }
 
-/* The pricing stage swaps its contents in place */
-@media (prefers-reduced-motion: no-preference) {
-  .stage-swap {
-    animation: stage-in 200ms var(--ease-out);
-  }
-}
-@keyframes stage-in {
-  from {
-    opacity: 0;
-  }
-}
-
 /* ---------------------------------------------------------------------------
  * Redesign 2026: the home page as a product story. Same copper, same Mona Sans;
  * a mono face for interface labels, status colours for the illustrated UI, and
@@ -560,26 +548,6 @@ h2 {
   .on-night .btn-ghost:hover {
     background: rgb(255 255 255 / 0.07);
   }
-
-  /* Interface frames: real product (live) and illustrations both sit in one */
-  .window {
-    border-radius: 14px;
-    background: var(--color-night-2);
-    color: var(--color-night-ink);
-    box-shadow:
-      0 0 0 1px rgb(255 255 255 / 0.08),
-      0 1px 0 0 rgb(255 255 255 / 0.06) inset,
-      0 40px 80px -30px rgb(0 0 0 / 0.7);
-    overflow: clip;
-  }
-  .window-light {
-    border-radius: 14px;
-    background: var(--color-surface);
-    box-shadow:
-      0 0 0 1px rgb(0 0 0 / 0.07),
-      0 24px 60px -28px rgb(20 20 30 / 0.28);
-    overflow: clip;
-  }
   .tag {
     display: inline-flex;
     align-items: center;
@@ -593,35 +561,6 @@ h2 {
     letter-spacing: 0.05em;
     text-transform: uppercase;
     white-space: nowrap;
-  }
-}
-
-/* Demo panels swap in place */
-@media (prefers-reduced-motion: no-preference) {
-  .swap-in {
-    animation: swap-in 420ms var(--ease-out) both;
-  }
-  .swap-in-late {
-    animation: swap-in 420ms var(--ease-out) 140ms both;
-  }
-}
-@keyframes swap-in {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-}
-.progress-bar {
-  transform-origin: left;
-}
-@media (prefers-reduced-motion: no-preference) {
-  .progress-run {
-    animation: progress var(--dur, 4200ms) linear forwards;
-  }
-}
-@keyframes progress {
-  from {
-    transform: scaleX(0);
   }
 }
 
@@ -647,65 +586,4 @@ h2 {
   font-size: 0.75rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-}
-/* A fine technical grid that fades toward the edges */
-.stage-grid {
-  background-image:
-    linear-gradient(rgb(255 255 255 / 0.045) 1px, transparent 1px),
-    linear-gradient(90deg, rgb(255 255 255 / 0.045) 1px, transparent 1px);
-  background-size: 48px 48px;
-  mask-image: radial-gradient(70% 60% at 50% 45%, #000 30%, transparent 80%);
-}
-.glow-copper {
-  background: radial-gradient(50% 50% at 50% 50%, rgb(232 169 127 / 0.22), rgb(154 82 38 / 0.08) 50%, transparent 72%);
-}
-/* App chrome inside the illustrated windows */
-.chrome-dots {
-  display: flex;
-  gap: 6px;
-}
-.chrome-dots span {
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  background: rgb(255 255 255 / 0.12);
-}
-/* Slow status breathing for "running" indicators */
-@media (prefers-reduced-motion: no-preference) {
-  .breathe {
-    animation: breathe 2.8s ease-in-out infinite;
-  }
-}
-@keyframes breathe {
-  50% {
-    opacity: 0.45;
-  }
-}
-
-/* The journey's pulse runs Discover → Choose → Set up, then starts over */
-@media (prefers-reduced-motion: no-preference) and (min-width: 768px) {
-  .journey-pulse {
-    animation: journey 4.8s var(--ease-soft) infinite;
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .journey-pulse {
-    display: none !important;
-  }
-}
-@keyframes journey {
-  0% {
-    left: 16.66%;
-    opacity: 0;
-  }
-  10% {
-    opacity: 1;
-  }
-  90% {
-    opacity: 1;
-  }
-  100% {
-    left: 83.33%;
-    opacity: 0;
-  }
 }

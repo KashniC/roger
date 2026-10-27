@@ -17,7 +17,7 @@ const FIRST = 5;
  * few more, or type to search all of it (on the server, since it runs to
  * thousands). The library page has everything else.
  */
-export function LibraryBrowse({ shelves, total }: { shelves: Shelf[]; total: number }) {
+export function LibraryBrowse({ shelves, total, heading }: { shelves: Shelf[]; total: number; heading?: React.ReactNode }) {
   const id = useId();
   const [open, setOpen] = useState(shelves[0]?.id);
   const [more, setMore] = useState(false);
@@ -48,36 +48,13 @@ export function LibraryBrowse({ shelves, total }: { shelves: Shelf[]; total: num
 
   return (
     <div>
-      <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
-        <div role="tablist" aria-label="Shelves" className={`-mx-4 flex gap-1 overflow-x-auto px-4 pb-1 scrollbar-none transition-opacity sm:mx-0 sm:flex-wrap sm:px-0 ${searching ? "opacity-40" : ""}`}>
-          {shelves.map((s) => {
-            const on = !searching && s.id === shelf.id;
-            return (
-              <button
-                key={s.id}
-                role="tab"
-                type="button"
-                aria-selected={on}
-                aria-controls={`${id}-list`}
-                onClick={() => {
-                  setOpen(s.id);
-                  setMore(false);
-                  setQ("");
-                }}
-                className={`chip min-h-11 shrink-0 rounded-full px-4 text-[0.9375rem] font-[560] transition-colors duration-200 ${
-                  on ? "bg-ink text-ground" : "text-ink-2 hover:bg-ground-2 hover:text-ink"
-                }`}
-              >
-                {s.label}
-              </button>
-            );
-          })}
-        </div>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        {heading}
         <form
           role="search"
           action="/library"
           onSubmit={() => trackEvent("library_search", { q: query.slice(0, 60) })}
-          className="relative w-full shrink-0 lg:w-[20rem]"
+          className="relative w-full shrink-0 sm:w-[20rem]"
         >
           <label htmlFor={`${id}-q`} className="sr-only">
             Search all {total.toLocaleString("en-CA")} use cases
@@ -91,12 +68,37 @@ export function LibraryBrowse({ shelves, total }: { shelves: Shelf[]; total: num
             maxLength={120}
             autoComplete="off"
             placeholder="Search, e.g. invoices"
-            className="h-12 w-full rounded-full border border-rule-strong bg-surface pl-11 pr-4 text-[1rem] outline-none transition-colors placeholder:text-ink-2/80 focus:border-ink"
+            className="h-12 w-full rounded-[10px] border border-rule-strong bg-ground pl-11 pr-4 text-[1rem] outline-none transition-colors placeholder:text-ink-2/80 focus:border-ink"
           />
         </form>
       </div>
 
-      <div id={`${id}-list`} role="tabpanel" aria-live="polite" className="mt-10 border-t border-ink/80">
+      <div role="tablist" aria-label="Shelves" className={`-mx-5 mt-5 flex gap-6 overflow-x-auto px-5 scrollbar-none sm:mx-0 sm:flex-wrap sm:gap-x-7 sm:gap-y-1 sm:px-0 ${searching ? "opacity-50" : ""}`}>
+        {shelves.map((s) => {
+          const on = !searching && s.id === shelf.id;
+          return (
+            <button
+              key={s.id}
+              role="tab"
+              type="button"
+              aria-selected={on}
+              aria-controls={`${id}-list`}
+              onClick={() => {
+                setOpen(s.id);
+                setMore(false);
+                setQ("");
+              }}
+              className={`min-h-11 shrink-0 border-b-2 text-[0.9375rem] font-[560] transition-colors duration-150 ${
+                on ? "border-accent text-ink" : "border-transparent text-ink-2 hover:text-ink"
+              }`}
+            >
+              {s.label}
+            </button>
+          );
+        })}
+      </div>
+
+      <div id={`${id}-list`} role="tabpanel" aria-live="polite" className="border-t border-rule">
         {searching && !current ? (
           <p className="py-6 text-ink-2">Searching…</p>
         ) : list.length === 0 ? (
@@ -108,16 +110,15 @@ export function LibraryBrowse({ shelves, total }: { shelves: Shelf[]; total: num
           </p>
         ) : (
           <ol>
-            {list.map((u, i) => (
-              <li key={u.id} className={!searching && i >= FIRST ? "swap-in" : ""}>
+            {list.map((u) => (
+              <li key={u.id}>
                 <a
                   href={u.url}
                   target="_blank"
                   rel="noopener noreferrer nofollow"
-                  className="group grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-6 gap-y-1 border-b border-rule py-5 sm:grid-cols-[3rem_minmax(0,1fr)_10rem_auto] sm:py-6"
+                  className="group grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-6 gap-y-1 border-b border-rule py-4 sm:grid-cols-[minmax(0,1fr)_9rem_auto] sm:py-5"
                 >
-                  <span className="mono hidden text-[0.8125rem] text-ink-2 sm:block">{String(i + 1).padStart(2, "0")}</span>
-                  <span className="text-[clamp(1.25rem,2.2vw,1.625rem)] font-[620] leading-tight tracking-[-0.03em] transition-colors group-hover:text-accent">{u.title}</span>
+                  <span className="text-[clamp(1.125rem,1.8vw,1.375rem)] font-[600] leading-snug tracking-[-0.02em] transition-colors duration-150 group-hover:text-accent">{u.title}</span>
                   <span className="col-start-1 text-[0.875rem] text-ink-2 sm:col-start-auto">{u.tool || "Any agent"}</span>
                   <ExternalIcon className="col-start-2 row-start-1 size-3.5 self-center text-ink-2 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-accent sm:col-start-auto sm:row-start-auto" />
                 </a>
@@ -127,7 +128,7 @@ export function LibraryBrowse({ shelves, total }: { shelves: Shelf[]; total: num
         )}
       </div>
 
-      <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
+      <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-3">
         {searching ? (
           current && current.total > 0 && (
             <Link href={`/library?q=${encodeURIComponent(query)}`} className="tlink chev py-2 text-[1rem]">
