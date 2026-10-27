@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Icon } from "@/components/icons";
+import { AgentCard } from "@/components/home/agent-card";
+import { Journey } from "@/components/home/journey";
 import { LibraryBrowse, type Entry } from "@/components/home/library-browse";
 import { Leads, pickStories } from "@/components/home/stories";
-import { WatchSentence } from "@/components/home/watch-sentence";
+import { WatchForm } from "@/components/home/watch-form";
 import { Interest } from "@/components/pack-cards";
 import { siteConfig } from "@/data/config";
 import { setupFaqs } from "@/data/faq";
@@ -45,8 +47,7 @@ function byShelf(list: UseCase[]) {
     .sort((a, b) => b.n - a.n);
 }
 
-/** The process in three steps, and the three facts about access; the detail lives on /setup. */
-const steps = ["Find it in the library.", "Take the instruction from the pack.", "Set it up yourself, or with Peter."];
+/** The three facts about access; the detail lives on /setup. */
 const facts = ["By default it drafts; you approve.", "It runs on your own accounts.", "We keep no passwords."];
 /** The FAQ answers that belong next to the prices. */
 const PRICE_QS = ["Which agent do you set up?", "What does it cost after the setup?"];
@@ -57,8 +58,11 @@ export default async function LibraryHome() {
 
   // the lead stories have the front page; the index below leaves them out
   const leads = pickStories(sorted);
-  const leadIds = new Set(leads.map((u) => u.id));
-  const shelves = byShelf(sorted.filter((u) => !leadIds.has(u.id)));
+  // the journey follows one real entry from the Morning brief's own shelf to that agent's instruction
+  const exampleAgent = livePack.agents.find((a) => a.id === "brief") ?? null;
+  const example = exampleAgent ? (sorted.find((u) => u.tool && !leads.includes(u) && exampleAgent.categories.includes(u.category)) ?? null) : null;
+  const shown = new Set([...leads, ...(example ? [example] : [])].map((u) => u.id));
+  const shelves = byShelf(sorted.filter((u) => !shown.has(u.id)));
 
   const total = all.length;
   const newest = sorted[0] && new Date(sorted[0].addedAt ?? sorted[0].weekOf).toLocaleDateString("en-CA", { weekday: "long", month: "long", day: "numeric", timeZone: "America/Toronto" });
@@ -79,12 +83,12 @@ export default async function LibraryHome() {
             <span className="tabular-nums">{total.toLocaleString("en-CA")} use cases</span>
           </p>
 
-          <div className="grid gap-8 border-b border-ink/15 py-10 md:py-14 lg:grid-cols-[minmax(0,8fr)_minmax(0,4fr)] lg:gap-0">
-            <h1 id="hero-title" className="display text-[clamp(3.5rem,9.4vw,8.75rem)] lg:pr-10">
-              What people’s AI agents <span className="text-accent">actually do.</span>
-            </h1>
-            <div className="flex flex-col justify-end lg:border-l lg:border-ink/15 lg:pl-8">
-              <p className="text-lead">Real use cases from public posts, read every morning. Set one up yourself for free, or have Peter do it.</p>
+          <div className="grid gap-12 border-b border-ink/15 py-10 md:py-14 lg:grid-cols-[minmax(0,6.6fr)_minmax(0,5.4fr)] lg:items-center lg:gap-0">
+            <div className="lg:pr-12">
+              <h1 id="hero-title" className="display text-[clamp(3.5rem,8vw,7.75rem)]">
+                What people’s AI agents <span className="text-accent">actually do.</span>
+              </h1>
+              <p className="mt-7 max-w-[30rem] text-lead">Real use cases from public posts, read every morning. Set one up yourself for free, or have Peter do it.</p>
               <div className="mt-7 flex flex-wrap items-center gap-x-6 gap-y-3">
                 <Link href={`/packs/${pack.id}`} className="btn btn-l">
                   Get the free 10-agent pack
@@ -93,6 +97,9 @@ export default async function LibraryHome() {
                   Or book a setup
                 </Link>
               </div>
+            </div>
+            <div className="lg:border-l lg:border-ink/15 lg:pl-12">
+              <AgentCard />
             </div>
           </div>
 
@@ -123,14 +130,11 @@ export default async function LibraryHome() {
           <h2 id="how-title" className="display text-[clamp(2.75rem,6vw,5.5rem)]">
             From their post to your agent.
           </h2>
-          <ol className="mt-12 grid gap-y-6 border-t border-white/30 pt-8 md:grid-cols-3 md:gap-x-10">
-            {steps.map((s, i) => (
-              <li key={s} className="flex items-baseline gap-4">
-                <span className="display text-[3rem] text-night/80">{i + 1}</span>
-                <span className="text-[1.25rem] font-[620] leading-snug tracking-[-0.015em]">{s}</span>
-              </li>
-            ))}
-          </ol>
+          {example && exampleAgent && (
+            <div className="mt-12">
+              <Journey entry={example} agent={exampleAgent} />
+            </div>
+          )}
           <p className="mt-12 flex flex-wrap items-center gap-x-8 gap-y-3 border-t border-white/30 pt-8 text-[1rem]">
             {facts.map((f) => (
               <span key={f} className="flex items-center gap-2">
@@ -228,16 +232,13 @@ export default async function LibraryHome() {
       </section>
 
       {/* 5 · Last word: watch for what isn't in the library yet */}
-      <section id="watch" aria-labelledby="watch-title" className="on-night scroll-mt-16 border-b border-white/10 bg-night py-24 text-night-ink md:py-28">
-        <div className="wrap grid gap-10 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:items-end lg:gap-16">
-          <h2 id="watch-title" className="display text-[clamp(2.75rem,5.6vw,5rem)]">
+      <section id="watch" aria-labelledby="watch-title" className="on-night scroll-mt-16 border-b border-white/10 bg-night py-24 text-night-ink md:py-32">
+        <div className="wrap">
+          <h2 id="watch-title" className="display text-[clamp(2.75rem,6vw,5.5rem)]">
             Not in the library <span className="text-accent-night">yet?</span>
           </h2>
-          <div>
-            <p className="text-night-ink-2">Leave a watch. One email the morning someone’s agent does it, with a link to stop.</p>
-            <div className="mt-5 rounded-[6px] bg-ground p-5 text-ink sm:p-6">
-              <WatchSentence />
-            </div>
+          <div className="mt-12">
+            <WatchForm />
           </div>
         </div>
       </section>
