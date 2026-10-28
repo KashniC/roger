@@ -104,7 +104,7 @@ export async function SiteFooter() {
       <div className="wrap grid gap-12 pb-10 pt-20 md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] md:pt-24">
         <div>
           <Link href="/" className="-ml-1 inline-flex items-center gap-2 rounded-md px-1 py-1 text-[1.25rem] font-[620] tracking-[-0.02em]">
-            <Toque className="size-[26px] text-accent-night" />
+            <Toque className="size-[26px] text-ground" />
             Roger
           </Link>
           <p className="mt-4 max-w-[22rem] text-small text-night-ink-2">
@@ -112,7 +112,7 @@ export async function SiteFooter() {
             start with a free pack, or have yours set up.
           </p>
           {contactEmail && (
-            <a href={`mailto:${contactEmail}`} className="tlink mt-5 inline-block py-1 text-small">
+            <a href={`mailto:${contactEmail}`} className="mt-5 inline-block py-1 text-small text-night-ink underline underline-offset-4 hover:no-underline">
               {contactEmail}
             </a>
           )}
@@ -120,7 +120,7 @@ export async function SiteFooter() {
         <nav aria-label="Footer" className="grid grid-cols-2 gap-8 sm:grid-cols-3">
           {columns.map((c) => (
             <div key={c.title}>
-              <p className="mono text-[0.75rem] uppercase tracking-[0.08em] text-night-ink-2">{c.title}</p>
+              <p className="text-[0.875rem] font-[600] text-night-ink-2">{c.title}</p>
               <ul className="mt-4 grid gap-1">
                 {c.links.map((l) => (
                   <li key={l.label}>
@@ -133,7 +133,7 @@ export async function SiteFooter() {
             </div>
           ))}
           <div>
-            <p className="mono text-[0.75rem] uppercase tracking-[0.08em] text-night-ink-2">Legal</p>
+            <p className="text-[0.875rem] font-[600] text-night-ink-2">Legal</p>
             <ul className="mt-4 grid gap-1">
               {legal.map((l) => (
                 <li key={l.label}>

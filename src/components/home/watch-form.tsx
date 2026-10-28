@@ -59,7 +59,7 @@ export function WatchForm() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder={SAMPLE}
-              className="mt-2 h-13 w-full rounded-[6px] border border-white/20 bg-night-2 px-4 text-[1.0625rem] text-night-ink outline-none transition-colors placeholder:text-night-ink-2 focus:border-accent-night"
+              className="mt-2 h-13 w-full rounded-full bg-ground px-6 text-[1.0625rem] text-ink outline-none placeholder:text-ink-2/70 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ground"
             />
           </div>
           <div>
@@ -73,17 +73,17 @@ export function WatchForm() {
               required
               autoComplete="email"
               placeholder="you@example.com"
-              className="mt-2 h-13 w-full rounded-[6px] border border-white/20 bg-night-2 px-4 text-[1.0625rem] text-night-ink outline-none transition-colors placeholder:text-night-ink-2 focus:border-accent-night"
+              className="mt-2 h-13 w-full rounded-full bg-ground px-6 text-[1.0625rem] text-ink outline-none placeholder:text-ink-2/70 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ground"
             />
           </div>
           <div aria-hidden="true" className="sr-only">
             <input type="text" name="_gotcha" tabIndex={-1} autoComplete="off" />
           </div>
-          <button type="submit" disabled={pending} className="btn btn-l mt-2 w-full disabled:opacity-60 sm:w-auto sm:justify-self-start">
+          <button type="submit" disabled={pending} className="btn btn-l btn-ink mt-2 w-full disabled:opacity-60 sm:w-auto sm:justify-self-start">
             {pending ? "Saving…" : "Watch for it"}
           </button>
           {state.status === "error" && (
-            <p role="alert" className="text-[0.9375rem] text-[#ffb4a8]">
+            <p role="alert" className="text-[0.9375rem] font-[600] text-ground">
               {state.message}
             </p>
           )}
@@ -92,7 +92,7 @@ export function WatchForm() {
 
       {/* what lands in the inbox */}
       <figure aria-label="What the email looks like">
-        <div className="overflow-hidden rounded-[8px] bg-surface text-ink shadow-[0_30px_60px_-30px_rgb(0_0_0/0.7)]">
+        <div className="overflow-hidden rounded-[10px] bg-surface text-ink">
           <div className="border-b border-ink/10 px-5 py-3.5 text-[0.8125rem]">
             <p className="flex justify-between gap-3">
               <span>
@@ -106,7 +106,7 @@ export function WatchForm() {
             <p>
               New for your watch <strong>“{shown}”</strong>:
             </p>
-            <div className="mt-3 border-l-2 border-accent pl-3">
+            <div className="mt-3 border-l-2 border-cobalt pl-3">
               {hit ? (
                 <>
                   <p className="font-[600]">{hit.title}</p>
@@ -117,12 +117,12 @@ export function WatchForm() {
               )}
             </div>
             <p className="mt-4 flex flex-wrap gap-x-5 gap-y-1 text-[0.875rem]">
-              <span className="text-accent underline underline-offset-4">Want it set up for you?</span>
+              <span className="text-cobalt underline underline-offset-4">Want it set up for you?</span>
               <span className="text-ink-2 underline underline-offset-4">Stop this watch</span>
             </p>
           </div>
         </div>
-        <figcaption className="mt-3 text-[0.8125rem] text-night-ink-2">The email you’d get, matched live from the library</figcaption>
+        <figcaption className="mt-3 text-[0.8125rem] text-cobalt-ink-2">The email you’d get, matched live from the library</figcaption>
       </figure>
     </div>
   );

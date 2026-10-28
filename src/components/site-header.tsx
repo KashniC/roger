@@ -43,7 +43,7 @@ function navFor(path: string): NavSet {
 export function SiteHeader() {
   const path = usePathname() || "/";
   const nav = navFor(path);
-  // the home page opens on a dark hero, so its bar is dark too; no scroll work either way
+  // the home page opens on the blue hero, so its bar is blue too; no scroll work either way
   const dark = path === "/";
   // The menu belongs to the page it was opened on, so navigating closes it.
   const [openOn, setOpenOn] = useState<string | null>(null);
@@ -66,18 +66,18 @@ export function SiteHeader() {
   }, [open]);
 
   return (
-    <header className={`sticky top-0 z-40 border-b ${dark ? "on-night border-white/10 bg-night text-night-ink" : "border-rule bg-ground text-ink"}`}>
+    <header className={`sticky top-0 z-40 border-b ${dark ? "on-night border-white/15 bg-cobalt text-ground" : "border-rule bg-ground text-ink"}`}>
       <a href="#main" className="sr-only-focusable absolute left-4 top-2 z-50 rounded-full bg-ink px-4 py-2 text-small text-ground">
         Skip to content
       </a>
       <div className="wrap flex h-[60px] items-center gap-6">
         <Link href="/" className="-ml-1 flex items-center gap-2 rounded-md px-1 py-1 text-[1.0625rem] font-[620] tracking-[-0.015em]">
-          <Toque className={`size-[22px] ${dark ? "text-accent-night" : "text-accent"}`} />
+          <Toque className={`size-[22px] ${dark ? "text-ground" : "text-accent"}`} />
           Roger
         </Link>
 
         <nav aria-label="Main" className="ml-auto hidden md:block">
-          <ul className={`flex items-center gap-5 whitespace-nowrap text-[0.9375rem] lg:gap-7 ${dark ? "text-night-ink-2" : "text-ink-2"}`}>
+          <ul className={`flex items-center gap-5 whitespace-nowrap text-[0.9375rem] lg:gap-7 ${dark ? "text-cobalt-ink-2" : "text-ink-2"}`}>
             {nav.links.map((l) => {
               const active = l.href === path;
               return (
@@ -99,7 +99,7 @@ export function SiteHeader() {
           {nav.cta && (
             <span className="header-cta">
               {nav.cta.href ? (
-                <Link href={nav.cta.href} className="btn btn-m">
+                <Link href={nav.cta.href} className={`btn btn-m ${dark ? "bg-ground text-ink hover:bg-white" : ""}`}>
                   <span className="hidden sm:inline">{nav.cta.label}</span>
                   <span className="sm:hidden">{nav.cta.short}</span>
                 </Link>

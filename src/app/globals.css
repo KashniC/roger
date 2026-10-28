@@ -494,10 +494,14 @@ h2 {
  */
 @theme static {
   --color-night-3: #25231f;
+  /* Blue hour: the one strong colour on the home page */
+  --color-cobalt: #2236e0; /* paper on it 7.2:1 */
+  --color-cobalt-deep: #1a2bb8;
+  --color-cobalt-ink-2: #c9cffa; /* 5.2:1 on cobalt */
   --color-ok: #2e7d4f;
   --color-ok-night: #86d6a6;
   --color-wait-night: #f3c47e;
-  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
 @layer components {
@@ -569,11 +573,11 @@ h2 {
  * moments, a fine grid for the product stages, and the motion that ties them.
  */
 .display {
-  /* Mona Sans at its condensed end: a newspaper's headline face from the brand's own family */
-  font-weight: 800;
-  font-stretch: 76%;
+  /* Instrument Serif: high contrast, set large, tight */
+  font-family: var(--font-serif), Georgia, serif;
+  font-weight: 400;
   letter-spacing: -0.02em;
-  line-height: 0.88;
+  line-height: 0.95;
 }
 .display-l {
   font-size: clamp(2.6rem, 6.4vw, 6rem);
@@ -599,4 +603,9 @@ h2 {
   from {
     opacity: 0;
   }
+}
+
+/* On the blue, focus rings are paper-white so they never disappear into it */
+.bg-cobalt :focus-visible {
+  outline-color: var(--color-ground);
 }

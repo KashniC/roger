@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Icon } from "@/components/icons";
-import { AgentCard } from "@/components/home/agent-card";
-import { Journey } from "@/components/home/journey";
-import { LibraryBrowse, type Entry } from "@/components/home/library-browse";
+import { HeroSearch, type Entry } from "@/components/home/hero-search";
 import { Leads, pickStories } from "@/components/home/stories";
 import { WatchForm } from "@/components/home/watch-form";
 import { Interest } from "@/components/pack-cards";
@@ -22,7 +20,6 @@ export const metadata: Metadata = {
 };
 
 const OPEN_IN_PACK = 3;
-const PER_SHELF = 10;
 
 const lean = (u: UseCase): Entry => ({
   id: u.id,
@@ -34,177 +31,166 @@ const lean = (u: UseCase): Entry => ({
   url: u.url,
 });
 
-/** Each shelf with its count and its newest few; the library page has the rest. */
-function byShelf(list: UseCase[]) {
+/** Shelves by size, for the browse links under the search. */
+function topShelves(list: UseCase[], n: number) {
   return categories
-    .map((c) => {
-      const all = list.filter((u) => u.category === c.id);
-      return { id: c.id, label: c.label, n: all.length, items: all.slice(0, PER_SHELF).map(lean) };
-    })
+    .map((c) => ({ id: c.id, label: c.label, n: list.filter((u) => u.category === c.id).length }))
     .filter((s) => s.n > 0)
-    .sort((a, b) => b.n - a.n);
+    .sort((a, b) => b.n - a.n)
+    .slice(0, n);
 }
 
-/** The three facts about access; the detail lives on /setup. */
-const facts = ["By default it drafts; you approve.", "It runs on your own accounts.", "We keep no passwords."];
+/** What a setup promises about access, from the setup terms. */
+const facts = ["It runs on your own accounts.", "By default it drafts; you approve.", "We keep no passwords."];
+/** The setup, step by step, as /setup describes it. */
+const steps = ["A free 20-minute call", "One setup session, by video", "A check-in a week later"];
 
 export default async function LibraryHome() {
   const [all, settings] = await Promise.all([getUseCases(), getSettings()]);
   const sorted = [...all].sort((a, b) => (b.addedAt ?? b.weekOf).localeCompare(a.addedAt ?? a.weekOf));
 
-  // the lead stories have the front page; the index below leaves them out
+  // the three results have their own section; the newest list under the search leaves them out
   const leads = pickStories(sorted);
-  // the journey follows one real entry from the Morning brief's own shelf to that agent's instruction
-  const exampleAgent = livePack.agents.find((a) => a.id === "brief") ?? null;
-  const example = exampleAgent ? (sorted.find((u) => u.tool && !leads.includes(u) && exampleAgent.categories.includes(u.category)) ?? null) : null;
-  const shown = new Set([...leads, ...(example ? [example] : [])].map((u) => u.id));
-  const shelves = byShelf(sorted.filter((u) => !shown.has(u.id)));
-
+  const leadIds = new Set(leads.map((u) => u.id));
   const total = all.length;
-  const plans = ladderFor(settings).rungs;
-  const who = ["You set it up", "Peter sets it up, with you", "After a setup"];
+  const [, setupPlan, monthly] = ladderFor(settings).rungs;
   const pack = livePack;
   const next = packs.filter((p) => p.status === "soon");
 
   return (
     <>
-      {/* 1 · The front page: masthead, headline, the lead stories */}
-      <section aria-labelledby="hero-title" className="bg-ground pb-6 pt-8 md:pt-10">
-        <div className="wrap">
-          <p className="mono flex flex-wrap justify-between gap-x-6 gap-y-1 border-b-2 border-ink pb-3 text-[0.75rem] uppercase tracking-[0.08em]">
-            <span>The morning edition</span>
-            <span className="tabular-nums">{total.toLocaleString("en-CA")} use cases</span>
-          </p>
+      {/* 1 · Blue hour: what Roger is, and the library to try right there */}
+      <section aria-labelledby="hero-title" className="on-night bg-cobalt text-ground">
+        <div className="wrap grid gap-14 pb-20 pt-14 md:pb-28 md:pt-20 lg:grid-cols-[minmax(0,6fr)_minmax(0,6fr)] lg:gap-16">
+          <div className="flex flex-col">
+            <h1 id="hero-title" className="display text-[clamp(3.5rem,8.4vw,8rem)]">
+              What people’s AI agents <em className="italic">actually</em> do.
+            </h1>
+            <p className="mt-8 max-w-[26rem] text-lead text-cobalt-ink-2">
+              {total.toLocaleString("en-CA")} real use cases from public posts, collected every morning.
+            </p>
+            <div className="mt-10 flex flex-wrap items-center gap-3 lg:mt-auto lg:pt-10">
+              <Link href={`/packs/${pack.id}`} className="btn btn-l bg-ground text-ink hover:bg-white">
+                Get the free 10-agent pack
+              </Link>
+              <a href={settings.setupCall} target="_blank" rel="noopener noreferrer" className="btn btn-l btn-ghost border-white/40 text-ground hover:bg-white/10">
+                Book a free setup call
+              </a>
+            </div>
+          </div>
+          <HeroSearch newest={sorted.filter((u) => !leadIds.has(u.id)).slice(0, 4).map(lean)} total={total} shelves={topShelves(sorted, 6)} />
+        </div>
+      </section>
 
-          <div className="grid gap-12 border-b border-ink/15 py-10 md:py-14 lg:grid-cols-[minmax(0,6.6fr)_minmax(0,5.4fr)] lg:items-center lg:gap-0">
-            <div className="lg:pr-12">
-              <h1 id="hero-title" className="display text-[clamp(3.5rem,8vw,7.75rem)]">
-                What people’s AI agents <span className="text-accent">actually do.</span>
-              </h1>
-              <p className="mt-7 max-w-[26rem] text-lead">Real use cases from public posts, collected every morning.</p>
-              <div className="mt-7 flex flex-wrap items-center gap-x-6 gap-y-3">
-                <Link href={`/packs/${pack.id}`} className="btn btn-l">
-                  Get the free 10-agent pack
+      {/* 2 · Three results, large */}
+      <section aria-labelledby="leads-title" className="bg-ground py-24 md:py-32">
+        <div className="wrap">
+          <h2 id="leads-title" className="display text-[clamp(2.75rem,5.4vw,4.75rem)]">
+            Three things agents <em className="italic">did</em>.
+          </h2>
+          <div className="mt-12">
+            <Leads stories={leads} />
+          </div>
+        </div>
+      </section>
+
+      {/* 3 · Two ways to get yours running, side by side */}
+      <section id="pricing" aria-labelledby="ways-title" className="scroll-mt-16">
+        <h2 id="ways-title" className="sr-only">
+          Two ways to get started
+        </h2>
+        <div className="grid lg:grid-cols-2">
+          {/* do it yourself */}
+          <div className="bg-ground-2 py-20 md:py-28">
+            <div className="w-full px-4 sm:px-6 lg:ml-auto lg:max-w-[590px] lg:pr-14">
+              <p className="text-[1rem] font-[600] text-cobalt">Do it yourself</p>
+              <p className="display mt-4 text-[clamp(3.5rem,6vw,5.5rem)]">Free</p>
+              <p className="mt-4 max-w-[26rem] text-lead text-ink-2">The starter pack: ten agents for a business of one, with the instructions to paste in.</p>
+              <ol className="mt-8 grid border-t border-ink/15 sm:grid-cols-2 sm:gap-x-8">
+                {pack.agents.map((a, i) => (
+                  <li key={a.id} className="flex items-baseline justify-between gap-3 border-b border-ink/10 py-2.5 text-[1rem]">
+                    <span>{a.name}</span>
+                    {i < OPEN_IN_PACK && <span className="text-[0.8125rem] text-cobalt">Open now</span>}
+                  </li>
+                ))}
+              </ol>
+              <p className="mt-3 text-[0.875rem] text-ink-2">{OPEN_IN_PACK} open now, the rest with your email.</p>
+              <Link href={`/packs/${pack.id}`} className="btn btn-l mt-8 bg-cobalt text-ground hover:bg-cobalt-deep">
+                Get the free pack
+              </Link>
+              {next.length > 0 && (
+                <div className="mt-12 border-t border-ink/15 pt-6">
+                  <p className="text-[0.9375rem] font-[600]">Packs coming next</p>
+                  <ul className="mt-3 flex flex-wrap gap-x-5 gap-y-3">
+                    {next.map((p) => (
+                      <li key={p.id} className="flex items-center gap-3">
+                        <span className="text-[0.9375rem]">{p.persona}</span>
+                        <Interest persona={p.id} tone="light" />
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* have it done */}
+          <div className="on-night bg-night py-20 text-night-ink md:py-28">
+            <div className="w-full px-4 sm:px-6 lg:max-w-[590px] lg:pl-14">
+              <p className="text-[1rem] font-[600] text-cobalt-ink-2">Have it done</p>
+              <p className="mt-4 flex items-baseline gap-3">
+                <span className="display text-[clamp(3.5rem,6vw,5.5rem)] tabular-nums">{setupPlan.price}</span>
+                <span className="text-lead text-night-ink-2">once</span>
+              </p>
+              <p className="mt-4 max-w-[26rem] text-lead text-night-ink-2">{setupPlan.body}</p>
+              <ol className="mt-8 border-t border-white/15">
+                {steps.map((s, i) => (
+                  <li key={s} className="flex items-baseline gap-4 border-b border-white/10 py-2.5 text-[1rem]">
+                    <span className="display w-6 text-[1.5rem] text-cobalt-ink-2">{i + 1}</span>
+                    {s}
+                  </li>
+                ))}
+              </ol>
+              <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
+                <a href={settings.setupCall} target="_blank" rel="noopener noreferrer" className="btn btn-l bg-ground text-ink hover:bg-white">
+                  Book a free setup call
+                </a>
+                <Link href="/setup" className="tlink chev py-2 text-[1rem]" style={{ color: "var(--color-cobalt-ink-2)" }}>
+                  What’s included
                 </Link>
               </div>
-            </div>
-            <div className="lg:border-l lg:border-ink/15 lg:pl-12">
-              <AgentCard />
+              <ul className="mt-10 grid gap-2 text-[0.9375rem] text-night-ink-2">
+                {facts.map((f) => (
+                  <li key={f} className="flex items-center gap-2.5">
+                    <Icon name="check" className="size-4 text-cobalt-ink-2" strokeWidth={2.2} /> {f}
+                  </li>
+                ))}
+              </ul>
+              <p className="mt-10 border-t border-white/15 pt-6 text-[0.9375rem] text-night-ink-2">
+                <span className="font-[600] text-night-ink">
+                  Then {monthly.price} {monthly.per}, if you want it.
+                </span>{" "}
+                {monthly.body}{" "}
+                <Link href={monthly.href} className="underline underline-offset-4 hover:text-night-ink">
+                  How the plan works
+                </Link>
+              </p>
+              <p className="mt-6 text-[0.8125rem] text-night-ink-2">
+                Prices in CAD, no HST charged. Your agent’s own subscription is paid to its provider.{" "}
+                <Link href="/companies" className="underline underline-offset-4 hover:text-night-ink">
+                  Roger for companies
+                </Link>
+              </p>
             </div>
           </div>
-
-          <Leads stories={leads} />
         </div>
       </section>
 
-      {/* 2 · The index: the whole library, on black */}
-      <section id="library" aria-labelledby="library-title" className="on-night scroll-mt-16 bg-night py-24 text-night-ink md:py-32">
-        <div className="wrap grid grid-cols-[minmax(0,1fr)] gap-10 lg:grid-cols-[minmax(0,4fr)_minmax(0,8fr)] lg:gap-16">
-          <div className="lg:sticky lg:top-24 lg:self-start">
-            <h2 id="library-title" className="display text-[clamp(3rem,6vw,5.5rem)]">
-              <span className="tabular-nums">{total.toLocaleString("en-CA")}</span> things agents did.
-            </h2>
-            <Link href="/library" className="tlink chev mt-6 inline-block py-1">
-              Open the full library
-            </Link>
-          </div>
-          <LibraryBrowse shelves={shelves} total={total} />
-        </div>
-      </section>
-
-      {/* 3 · How it works, and the rules: one band of the brand orange */}
-      <section aria-labelledby="how-title" className="bg-accent py-24 text-accent-ink md:py-28">
-        <div className="wrap">
-          <h2 id="how-title" className="display text-[clamp(2.75rem,6vw,5.5rem)]">
-            From their post to your agent.
-          </h2>
-          {example && exampleAgent && (
-            <div className="mt-12">
-              <Journey entry={example} agent={exampleAgent} />
-            </div>
-          )}
-          <p className="mt-12 flex flex-wrap items-center gap-x-8 gap-y-3 border-t border-white/30 pt-8 text-[1rem]">
-            {facts.map((f) => (
-              <span key={f} className="flex items-center gap-2">
-                <Icon name="check" className="size-4" strokeWidth={2.2} /> {f}
-              </span>
-            ))}
-            <Link href="/setup" className="ml-auto font-[600] underline underline-offset-4 hover:no-underline">
-              How a setup works
-            </Link>
-          </p>
-        </div>
-      </section>
-
-      {/* 4 · Prices, as a ruled table */}
-      <section id="pricing" aria-labelledby="price-title" className="scroll-mt-16 bg-ground py-24 md:py-32">
-        <div className="wrap">
-          <h2 id="price-title" className="display text-[clamp(2.75rem,6vw,5.5rem)]">
-            Free, once, <span className="text-accent">or monthly.</span>
-          </h2>
-          <ol className="mt-12 border-t-2 border-ink">
-            {plans.map((p, i) => (
-              <li key={p.name} className="border-b border-ink/15">
-                <div className="grid gap-x-8 gap-y-3 py-7 md:grid-cols-[minmax(0,3fr)_minmax(0,2.2fr)_minmax(0,4fr)_12.5rem] md:items-center">
-                  <p>
-                    <span className="block text-[1.375rem] font-[650] tracking-[-0.02em]">{p.name}</span>
-                    <span className="mono text-[0.75rem] uppercase tracking-[0.06em] text-ink-2">{who[i]}</span>
-                  </p>
-                  <p className="flex items-baseline gap-2">
-                    <span className={`display text-[clamp(3rem,5vw,4.25rem)] tabular-nums ${i === 0 ? "text-accent" : ""}`}>{p.price}</span>
-                    {p.per && <span className="text-ink-2">{p.per}</span>}
-                  </p>
-                  <div className="text-[1rem] text-ink-2">
-                    <details className="group">
-                      <summary className="flex min-h-10 cursor-pointer list-none items-center gap-2 text-[0.9375rem] font-[560] text-ink hover:text-accent [&::-webkit-details-marker]:hidden">
-                        What’s included
-                        <Icon name="plus" className="size-3.5 transition-transform duration-200 group-open:rotate-45" />
-                      </summary>
-                      <p className="mt-1 text-[0.9375rem]">{i === 0 ? `Ten agents with the instructions to paste in. ${OPEN_IN_PACK} open now, the rest with your email.` : p.body}</p>
-                      <ul className="mt-2 grid gap-1.5 text-[0.9375rem]">
-                        {p.includes.map((x) => (
-                          <li key={x}>— {x}</li>
-                        ))}
-                      </ul>
-                    </details>
-                  </div>
-                  <Link href={p.href} className={`btn btn-m justify-self-start md:justify-self-end ${i === 0 ? "" : "btn-ink"}`}>
-                    {p.cta}
-                  </Link>
-                </div>
-              </li>
-            ))}
-          </ol>
-
-          <div className="mt-10">
-            {next.length > 0 && (
-              <div>
-                <p className="text-[1rem] font-[600]">Free packs coming next</p>
-                <ul className="mt-4 flex flex-wrap gap-x-6 gap-y-4">
-                  {next.map((p) => (
-                    <li key={p.id} className="flex items-center gap-3">
-                      <span className="font-[600]">{p.persona}</span>
-                      <Interest persona={p.id} tone="light" />
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-          </div>
-          <p className="mt-10 text-small text-ink-2">
-            Prices in CAD, no HST charged.{" "}
-            <Link href="/companies" className="tlink chev">
-              Roger for companies
-            </Link>
-          </p>
-        </div>
-      </section>
-
-      {/* 5 · Last word: watch for what isn't in the library yet */}
-      <section id="watch" aria-labelledby="watch-title" className="on-night scroll-mt-16 border-b border-white/10 bg-night py-24 text-night-ink md:py-32">
+      {/* 4 · Last word, back in blue: watch for what isn't in the library yet */}
+      <section id="watch" aria-labelledby="watch-title" className="scroll-mt-16 bg-cobalt py-24 text-ground md:py-32">
         <div className="wrap">
           <h2 id="watch-title" className="display text-[clamp(2.75rem,6vw,5.5rem)]">
-            Not in the library <span className="text-accent-night">yet?</span>
+            Not in the library <em className="italic">yet?</em>
           </h2>
           <div className="mt-12">
             <WatchForm />
